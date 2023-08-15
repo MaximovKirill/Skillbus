@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skillbus</title>
+  <link href="css/normalize.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <script defer src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+  <script defer src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script defer src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      createSkillbusApp(document.getElementById('tbody'), document.getElementById('addBtn'));
+    });
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="visually-hidden">SRM-система Skillbus</h1>
+      <div class="header__wrap flex">
+        <a class="header__logo" href="#" aria-label="Главная страница Skillbus">
+          <img class="header__logo" src="img/logo.svg" alt="Логотип Skillbus">
+        </a>
+        <input class="header__search" type="search" placeholder="Введите запрос">
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <section class="clients section-offset">
+      <div class="container">
+        <h2 class="clients__title section-title">Клиенты</h2>
+        <table class="clients__table table">
+          <thead class="table__thead">
+            <tr class="table__tr-th">
+              <th class="table__th table__th_id" scope="col" data-path="0">
+                <span class="table__span-id">ID</span>
+              </th>
+              <th class="table__th table__th_fio" scope="col" data-path="1">
+                <span class="table__span-fio">Фамилия Имя Отчество</span>
+              </th>
+              <th class="table__th table__th_created" scope="col" data-path="2">
+                <span class="table__span-created">Дата и время создания</span>
+              </th>
+              <th class="table__th table__th_changed" scope="col" data-path="3">
+                <span class="table__span-changed">Последние изменения</span>
+              </th>
+              <th class="table__th table__th_contacts" scope="col" data-path="4">Контакты</th>
+              <th class="table__th table__th_does" scope="col" data-path="5">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tbody" class="table__tbody">
+            <tr class="table__tr table__tr_default">
+              <td class="table__td table__td_default" colspan="6">
+                <img class="table__loading-img" src="img/loading.svg" alt="Загрузка">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button id="addBtn" class="clients__add-btn btn-reset" type="button">Добавить клиента</button>
+
+        <dialog class="clients__dialog clients__dialog_new dialog">
+          <div class="dialog__wrap dialog__wrap_new wrap-new">
+            <div class="wrap-new__top flex">
+              <div class="dialog__wrap-title">
+                <h3 class="dialog__title dialog__title_new">Изменить данные</h3>
+              </div>
+              <div class="dialog__wrap-data flex">
+                <label class="dialog__label label">
+                  <span class="label__descr">
+                    Фамилия
+                    <span class="label__simbol">*</span>
+                  </span>
+                  <input class="dialog__input dialog__input-new dialog__input-new_surname" type="text">
+                </label>
+                <label class="dialog__label label">
+                  <span class="label__descr">
+                    Имя
+                    <span class="label__simbol">*</span>
+                  </span>
+                  <input class="dialog__input dialog__input-new dialog__input-new_name" type="text">
+                </label>
+                <label class="dialog__label label">
+                  <span class="label__descr">Отчество</span>
+                  <input class="dialog__input dialog__input-new dialog__input-new_lastName" type="text">
+                </label>
+              </div>
+            </div>
+            <div class="wrap-new__contacts flex hidden"></div>
+            <button class="wrap-new__add-contact add-contact btn-reset flex">
+              <div class="add-contact__plus"></div>
+              <span class="add-contact__descr">Добавить контакт</span>
+            </button>
+            <div class="wrap-new__bottom flex">
+              <button class="dialog__button dialog__button_new btn-reset" type="button">Сохранить</button>
+              <button class="dialog__button dialog__button_cancel btn-reset" type="button">Отмена</button>
+            </div>
+            <button class="dialog__button_close btn-reset">
+              <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M22.2332 7.73333L21.2665 6.76666L14.4998 13.5334L7.73318 6.7667L6.76652 7.73336L13.5332 14.5L6.76654 21.2667L7.73321 22.2333L14.4998 15.4667L21.2665 22.2334L22.2332 21.2667L15.4665 14.5L22.2332 7.73333Z" fill="#b0b0b0"/>
+              </svg>
+            </button>
+          </div>
+        </dialog>
+
+        <dialog class="clients__dialog clients__dialog_change dialog">
+          <div class="dialog__wrap dialog__wrap_change wrap-change">
+            <div class="wrap-change__top flex">
+              <div class="dialog__wrap-title">
+                <h3 class="dialog__title dialog__title_change">Изменить данные</h3>
+                <span class="dialog__id"></span>
+              </div>
+              <div class="dialog__wrap-data flex">
+                <label class="dialog__label label">
+                  <span class="label__descr">
+                    Фамилия
+                    <span class="label__simbol">*</span>
+                  </span>
+                  <input class="dialog__input dialog__input-change_surname" type="text">
+                </label>
+                <label class="dialog__label label">
+                  <span class="label__descr">
+                    Имя
+                    <span class="label__simbol">*</span>
+                  </span>
+                  <input class="dialog__input dialog__input-change_name" type="text">
+                </label>
+                <label class="dialog__label label">
+                  <span class="label__descr">Отчество</span>
+                  <input class="dialog__input dialog__input-change_lastName" type="text">
+                </label>
+              </div>
+            </div>
+            <div class="wrap-change__contacts flex"></div>
+            <button class="wrap-change__add-contact add-contact btn-reset flex">
+              <div class="add-contact__plus"></div>
+              <span class="add-contact__descr">Добавить контакт</span>
+            </button>
+            <div class="wrap-change__bottom flex">
+              <button class="dialog__button dialog__button_change btn-reset" type="button">Сохранить</button>
+              <button class="dialog__button dialog__button_change-del btn-reset" type="button">Удалить клиента</button>
+            </div>
+            <button class="dialog__button_close btn-reset">
+              <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M22.2332 7.73333L21.2665 6.76666L14.4998 13.5334L7.73318 6.7667L6.76652 7.73336L13.5332 14.5L6.76654 21.2667L7.73321 22.2333L14.4998 15.4667L21.2665 22.2334L22.2332 21.2667L15.4665 14.5L22.2332 7.73333Z" fill="#b0b0b0"/>
+              </svg>
+            </button>
+          </div>
+        </dialog>
+
+        <dialog class="clients__dialog clients__dialog_delete dialog">
+          <div class="dialog__wrap dialog__wrap_delete flex">
+            <h3 class="dialog__title dialog__title_delete">Удалить клиента</h3>
+            <span class="dialog__deskr">Вы действительно хотите удалить данного клиента?</span>
+            <button class="dialog__button dialog__button_del btn-reset" type="button">Удалить</button>
+            <button class="dialog__button dialog__button_cancel btn-reset" type="button">Отмена</button>
+            <button class="dialog__button_close btn-reset">
+              <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M22.2332 7.73333L21.2665 6.76666L14.4998 13.5334L7.73318 6.7667L6.76652 7.73336L13.5332 14.5L6.76654 21.2667L7.73321 22.2333L14.4998 15.4667L21.2665 22.2334L22.2332 21.2667L15.4665 14.5L22.2332 7.73333Z" fill="#b0b0b0"/>
+              </svg>
+            </button>
+          </div>
+        </dialog>
+
+
+      </div>
+    </section>
+  </main>
+</body>
+</html>
+
