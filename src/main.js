@@ -48,7 +48,6 @@
     inputs.forEach((elem) => {
       if (elem.value) {
         document.querySelector(`.label:has(.${elem.classList[elem.classList.length - 1]}) .label__descr`).classList.add('label__descr_filled');
-
       } else {
           document.querySelector(`.label:has(.${elem.classList[elem.classList.length - 1]}) .label__descr`).classList.remove('label__descr_filled');
         };
@@ -94,9 +93,11 @@
         if (contacts) {
           contacts.innerHTML = '';
         };
-        document.querySelectorAll('.label__descr').forEach((elem) => {
-          elem.classList.remove('label__descr_filled');
-        });
+        if (!(dialogClass === 'clients__dialog_delete')) {
+          document.querySelectorAll('.label__descr').forEach((elem) => {
+            elem.classList.remove('label__descr_filled');
+          });
+        };
         document.querySelector('.wrap-change__contacts').classList.remove('hidden');
         document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
       }, 200);
@@ -104,34 +105,139 @@
   };
 
   // Закрытие диалогового окна по нажатию ESC
-  // (из-за нативного закрытия по ESC smoothlyClossingDialog() не срабатывает)
-
-  // ЗАбить на это и закинуть закрытие по esc в функцию открытия
-
-  function closeEsc() {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        // smoothlyClossingDialog();
-        if (document.querySelector('.clients__dialog_change[open]') && !document.querySelector('.clients__dialog_delete[open]')) {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // smoothlyClossingDialog();
+      if (document.querySelector('.clients__dialog_change[open]') && !document.querySelector('.clients__dialog_delete[open]')) {
+        document.body.classList.remove('scroll-lock');
+        let contacts = document.querySelector(`.wrap-change__contacts`);
+        if (contacts) {
+          contacts.innerHTML = '';
+        };
+        document.querySelectorAll('.label__descr').forEach((elem) => {
+          elem.classList.remove('label__descr_filled');
+        });
+        document.querySelector('.wrap-change__contacts').classList.remove('hidden');
+        document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
+      } else if (!document.querySelector('.clients__dialog_change[open]') && document.querySelector('.clients__dialog_delete[open]')) {
           document.body.classList.remove('scroll-lock');
-          let contacts = document.querySelector(`.wrap-change__contacts`);
-          if (contacts) {
-            contacts.innerHTML = '';
-          };
-          document.querySelectorAll('.label__descr').forEach((elem) => {
-            elem.classList.remove('label__descr_filled');
-          });
-          document.querySelector('.wrap-change__contacts').classList.remove('hidden');
-          document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
-        } else if (!document.querySelector('.clients__dialog_change[open]') && document.querySelector('.clients__dialog_delete[open]')) {
-            document.body.classList.remove('scroll-lock');
-          };
-      };
-    });
-  };
-  closeEsc();
+        };
+    };
+  });
 
-  function getClient(client = {}, {toChangeClient, toDeleteClient} = {}, arr = [], workArr = []) {
+  // Открыть окно добавления клиента
+  function addClientWindowOpen() {
+    openDialogAndLockScroll('clients__dialog_new');
+    let addContactButton = document.querySelector('.wrap-new__add-contact');
+    // Добавление контактов
+    if (addContactButton) {
+      addContactButton.onclick = () => {
+        if (document.querySelectorAll('.wrap-new__contact').length === 0) {
+          document.querySelector('.wrap-new__contacts').classList.remove('hidden');
+        };
+        let clientsContactNew = document.createElement('div');
+        let typeContact = document.createElement('select');
+        let typesContact = [];
+        for (let i = 0; i < 5; i++) {
+          typesContact[i] = document.createElement('option');
+        };
+        let valueContact = document.createElement('input');
+        let btnDelContact = document.createElement('button');
+        clientsContactNew.classList.add('wrap-new__contact', 'contact', 'flex');
+        typeContact.classList.add('contact__type');
+        valueContact.classList.add('contact__value');
+        btnDelContact.classList.add('contact__btn-del', 'btn-reset');
+        document.querySelector('.wrap-new__contacts').append(clientsContactNew);
+        clientsContactNew.append(typeContact);
+        for (let i = 0; i < 5; i++) {
+          typeContact.append(typesContact[i]);
+          typesContact[i].classList.add('contact__type-option');
+          switch (i) {
+            case 0:
+              typesContact[i].setAttribute('value', 'Телефон');
+              typesContact[i].textContent = 'Телефон';
+              break;
+            case 1:
+              typesContact[i].setAttribute('value', 'Email');
+              typesContact[i].textContent = 'Email';
+              break;
+            case 2:
+              typesContact[i].setAttribute('value', 'Facebook');
+              typesContact[i].textContent = 'Facebook';
+              break;
+            case 3:
+              typesContact[i].setAttribute('value', 'VK');
+              typesContact[i].textContent = 'VK';
+              break;
+            case 4:
+              typesContact[i].setAttribute('value', 'Другое');
+              typesContact[i].textContent = 'Другое';
+              break;
+          };
+        };
+        clientsContactNew.append(valueContact);
+        clientsContactNew.append(btnDelContact);
+        // Удалить контакт
+        btnDelContact.onclick = () => {
+          if (document.querySelectorAll('.wrap-new__contact').length === 10) {
+            addContactButton.classList.remove('hidden');
+          };
+          clientsContactNew.remove();
+          if (document.querySelectorAll('.wrap-new__contact').length === 0) {
+            document.querySelector('.wrap-new__contacts').classList.add('hidden');
+          };
+        };
+        tippy(btnDelContact, {
+          content: 'Удалить контакт',
+          appendTo: document.querySelector('.clients__dialog_new'),
+        });
+        customizeSelect(typeContact);
+        let contactsElements = document.querySelectorAll('.wrap-new__contact');
+        if (contactsElements.length === 10) {
+          addContactButton.classList.add('hidden');
+        };
+      };
+    };
+  };
+
+  // Закрыть окно добавления клиента
+  function addClientWindowClose() {
+    let inputName = document.querySelector('.dialog__input-new_name');
+    let inputSurname = document.querySelector('.dialog__input-new_surname');
+    let inputLastName = document.querySelector('.dialog__input-new_lastName');
+    let contacts = document.querySelector('.wrap-new__contacts');
+    let inputsNew = document.querySelectorAll('.label__descr_new');
+    inputName.value = '';
+    inputSurname.value = '';
+    inputLastName.value = '';
+    if (contacts) {
+      contacts.innerHTML = '';
+      contacts.classList.add('hidden');
+    };
+    inputsNew.forEach((elem) => {
+      elem.classList.remove('label__descr_new-filled');
+    });
+    smoothlyClossingDialog('clients__dialog_new');
+  };
+
+  // Сортировка
+  let sortData = [
+    'id',
+    NaN,
+    'createdAt',
+    'updatedAt',
+  ];
+  let sort = (arr, prop, dir = false) => arr.sort((a, b) => (!dir ? a[prop] < b[prop] : a[prop] > b[prop]) ? -1 : 1);
+  let sortByFIO = (arr, propSname, propFname, propLname, dir = false) => arr.sort((a, b) => {
+    if (!dir) {
+      return (b[propSname] < a[propSname]) - (a[propSname] < b[propSname]) || (b[propFname] < a[propFname]) - (a[propFname] < b[propFname]) || (b[propLname] < a[propLname]) - (a[propLname] < b[propLname]);
+    } else {
+        return (b[propSname] > a[propSname]) - (a[propSname] > b[propSname]) || (b[propFname] > a[propFname]) - (a[propFname] > b[propFname]) || (b[propLname] > a[propLname]) - (a[propLname] > b[propLname]);
+      };
+  });
+
+  //Рендер клиента
+  function getClient(client = {}, {toRequestClient, toChangeClient, toDeleteClient} = {}, workArr = [], renderArr = []) {
     let row = document.createElement('tr');
     let col1 = document.createElement('td');
     let col2 = document.createElement('td');
@@ -153,7 +259,11 @@
     let col6 = document.createElement('td');
     let wrapCol6 = document.createElement('div');
     let toChangeElemCol6 = document.createElement('button');
-    let toDeleteElemCol6 = document.createElement('button');
+    let toChangeElemCol6Icon = document.createElement('span');
+    let toChangeElemCol6Span = document.createElement('span');
+    let toDeleteElemCol6 = document.createElement('button')
+    let toDeleteElemCol6Icon = document.createElement('span');
+    let toDeleteElemCol6Span = document.createElement('span');
 
     row.append(col1);
     row.append(col2);
@@ -176,7 +286,11 @@
     row.append(col6);
     col6.append(wrapCol6);
     wrapCol6.append(toChangeElemCol6);
+    toChangeElemCol6.append(toChangeElemCol6Icon);
+    toChangeElemCol6.append(toChangeElemCol6Span);
     wrapCol6.append(toDeleteElemCol6);
+    toDeleteElemCol6.append(toDeleteElemCol6Icon);
+    toDeleteElemCol6.append(toDeleteElemCol6Span);
 
     row.classList.add('table__tr');
     col1.classList.add('table__td', 'table__td_id');
@@ -193,8 +307,12 @@
     wrapCol5.classList.add('table__wrapCol5', 'flex');
     col6.classList.add('table__td', 'table__td_does');
     wrapCol6.classList.add('table__wrapCol6', 'flex');
-    toChangeElemCol6.classList.add('table__toChangeElemCol6', 'btn-reset');
-    toDeleteElemCol6.classList.add('table__toDeleteElemCol6', 'btn-reset');
+    toChangeElemCol6.classList.add('table__toChangeElemCol6', 'flex', 'btn-reset');
+    toChangeElemCol6Icon.classList.add('table__toChangeElemCol6Icon');
+    toChangeElemCol6Span.classList.add('table__toChangeElemCol6Span');
+    toDeleteElemCol6.classList.add('table__toDeleteElemCol6', 'flex', 'btn-reset');
+    toDeleteElemCol6Icon.classList.add('table__toDeleteElemCol6Icon')
+    toDeleteElemCol6Span.classList.add('table__toDeleteElemCol6Span')
 
     // Столбец ID
     col1.textContent = client.id;
@@ -244,249 +362,377 @@
     };
 
     // Столбец действия
-    toChangeElemCol6.textContent = 'Изменить';
-    toDeleteElemCol6.textContent = 'Удалить';
+    toChangeElemCol6Span.textContent = 'Изменить';
+    toDeleteElemCol6Span.textContent = 'Удалить';
 
     // Методы
-    function deleteClient() {
-      openDialogAndLockScroll('clients__dialog_delete');
-      let deleteButton = document.querySelector('.dialog__button_del');
-      if (deleteButton) {
-        deleteButton.onclick = () => {
-          toDeleteClient(client);
-          row.remove();
-          let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
-          if (Number(indexOfDeletedClient) >= 0) {
-            workArr.splice(indexOfDeletedClient, 1)
+    // Удаление
+    async function deleteClient(workArr = [], renderArr = []) {
+      let requestClient = await toRequestClient(client)
+                            .then((prom) => {
+                              toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
+                              toDeleteElemCol6Span.classList.remove('loading-text-delete');
+                              document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+                                if (elem) {
+                                  elem.disabled = false;
+                                };
+                              });
+                              document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+                                if (elem) {
+                                  elem.disabled = false;
+                                };
+                              });
+                              document.querySelector('.clients__add-btn').disabled = false;
+                              return prom;
+                            })
+                            .catch((error) => {
+                              console.log(`Ошибка: ${error.message}`)
+                            });
+      if (requestClient) {
+        openDialogAndLockScroll('clients__dialog_delete');
+        let deleteButton = document.querySelector('.dialog__button_del');
+        if (deleteButton) {
+          deleteButton.onclick = () => {
+            toDeleteClient(client);
+            row.remove();
+            let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+            if (Number(indexOfDeletedClient) >= 0) {
+              workArr.splice(indexOfDeletedClient, 1);
+              renderArr.splice(indexOfDeletedClient, 1);
+            };
+            smoothlyClossingDialog('clients__dialog_delete');
+            smoothlyClossingDialog('clients__dialog_change');
           };
-          smoothlyClossingDialog('clients__dialog_delete');
-          smoothlyClossingDialog('clients__dialog_change');
+        };
+      };
+    };
+
+    // Изменение
+    async function changeClient(workArr = [], renderArr = []) {
+      let requestClient = await toRequestClient(client)
+                            .then((prom) => {
+                              toChangeElemCol6Icon.classList.remove('loading-icon', 'loading-icon_change');
+                              toChangeElemCol6Span.classList.remove('loading-text-change');
+                              document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+                                if (elem) {
+                                  elem.disabled = false;
+                                };
+                              });
+                              document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+                                if (elem) {
+                                  elem.disabled = false;
+                                };
+                              });
+                              document.querySelector('.clients__add-btn').disabled = false;
+                              return prom;
+                            })
+                            .catch((error) => {
+                              console.log(`Ошибка: ${error.message}`)
+                            });
+      if (requestClient) {
+        openDialogAndLockScroll('clients__dialog_change');
+        // Рендер
+        if (requestClient.contacts.length === 0) {
+          document.querySelector('.wrap-change__contacts').classList.add('hidden');
+        };
+        if (requestClient.contacts.length === 10) {
+          document.querySelector('.wrap-change__add-contact').classList.add('hidden');
+        };
+        let idInTitleDialog = document.querySelector('.dialog__id');
+        let inputName = document.querySelector('.dialog__input-change_name');
+        let inputSurname = document.querySelector('.dialog__input-change_surname');
+        let inputLastName = document.querySelector('.dialog__input-change_lastName');
+        idInTitleDialog.textContent = `ID: ${requestClient.id}`;
+        inputName.value = `${requestClient.name}`;
+        inputSurname.value = `${requestClient.surname}`;
+        inputLastName.value = `${requestClient.lastName}`;
+        if (requestClient.contacts.length) {
+          let clientsContacts = [];
+          for (let i = 0; i < 10; i++) {
+            clientsContacts[i] = document.createElement('div');
+          };
+          for (let i = 0; i < requestClient.contacts.length; i++) {
+            document.querySelector('.wrap-change__contacts').append(clientsContacts[i]);
+            clientsContacts[i].classList.add('wrap-change__contact', 'contact', 'flex');
+            let typeContact = document.createElement('select');
+            let typesContact = [];
+            for (let index = 0; index < 5; index++) {
+              typesContact[index] = document.createElement('option');
+            };
+            let valueContact = document.createElement('input');
+            let btnDelContact = document.createElement('button');
+            clientsContacts[i].append(typeContact);
+            for (let index = 0; index < 5; index++) {
+              typeContact.append(typesContact[index]);
+              typesContact[index].classList.add('contact__type-option');
+              switch (index) {
+                case 0:
+                  typesContact[index].setAttribute('value', 'Телефон');
+                  typesContact[index].textContent = 'Телефон';
+                  if (requestClient.contacts[i]['type'] === 'Телефон') {
+                    typesContact[index].setAttribute('selected', 'true');
+                  };
+                  break;
+                case 1:
+                  typesContact[index].setAttribute('value', 'Email');
+                  typesContact[index].textContent = 'Email';
+                  if (requestClient.contacts[i]['type'] === 'Email') {
+                    typesContact[index].setAttribute('selected', 'true');
+                  };
+                  break;
+                case 2:
+                  typesContact[index].setAttribute('value', 'Facebook');
+                  typesContact[index].textContent = 'Facebook';
+                  if (requestClient.contacts[i]['type'] === 'Facebook') {
+                    typesContact[index].setAttribute('selected', 'true');
+                  };
+                  break;
+                case 3:
+                  typesContact[index].setAttribute('value', 'VK');
+                  typesContact[index].textContent = 'VK';
+                  if (requestClient.contacts[i]['type'] === 'VK') {
+                    typesContact[index].setAttribute('selected', 'true');
+                  };
+                  break;
+                case 4:
+                  typesContact[index].setAttribute('value', 'Другое');
+                  typesContact[index].textContent = 'Другое';
+                  if (requestClient.contacts[i]['type'] === 'Другое') {
+                    typesContact[index].setAttribute('selected', 'true');
+                  };
+                  break;
+              };
+            };
+            typeContact.classList.add('contact__type');
+            valueContact.classList.add('contact__value');
+            btnDelContact.classList.add('contact__btn-del', 'btn-reset');
+            clientsContacts[i].append(valueContact);
+            clientsContacts[i].append(btnDelContact);
+            tippy(btnDelContact, {
+              content: 'Удалить контакт',
+              appendTo: document.querySelector('.clients__dialog_change'),
+            });
+            // Удалить контакт
+            btnDelContact.onclick = () => {
+              if (document.querySelectorAll('.wrap-change__contact').length === 10) {
+                addContactButton.classList.remove('hidden');
+              };
+              clientsContacts[i].remove();
+              if (document.querySelectorAll('.wrap-change__contact').length === 0) {
+                document.querySelector('.wrap-change__contacts').classList.add('hidden');
+              };
+            };
+            valueContact.value = `${requestClient.contacts[i]['value']}`
+          };
+        };
+        // select
+        let customSelectArr = document.querySelectorAll('.contact__type');
+        customSelectArr.forEach((elem) => {
+          customizeSelect(elem);
+        });
+        // Добавить контакт
+        let addContactButton = document.querySelector('.wrap-change__add-contact');
+        if (addContactButton) {
+          addContactButton.onclick = () => {
+            if ((requestClient.contacts.length === 0) || (document.querySelectorAll('.wrap-change__contact').length === 0) ) {
+              document.querySelector('.wrap-change__contacts').classList.remove('hidden');
+            };
+            let clientsContactNew = document.createElement('div');
+            let typeContact = document.createElement('select');
+            let typesContact = [];
+            for (let i = 0; i < 5; i++) {
+              typesContact[i] = document.createElement('option');
+            };
+            let valueContact = document.createElement('input');
+            let btnDelContact = document.createElement('button');
+            clientsContactNew.classList.add('wrap-change__contact', 'contact', 'flex');
+            typeContact.classList.add('contact__type');
+            valueContact.classList.add('contact__value');
+            btnDelContact.classList.add('contact__btn-del', 'btn-reset');
+            document.querySelector('.wrap-change__contacts').append(clientsContactNew);
+            clientsContactNew.append(typeContact);
+            for (let i = 0; i < 5; i++) {
+              typeContact.append(typesContact[i]);
+              typesContact[i].classList.add('contact__type-option');
+              switch (i) {
+                case 0:
+                  typesContact[i].setAttribute('value', 'Телефон');
+                  typesContact[i].textContent = 'Телефон';
+                  break;
+                case 1:
+                  typesContact[i].setAttribute('value', 'Email');
+                  typesContact[i].textContent = 'Email';
+                  break;
+                case 2:
+                  typesContact[i].setAttribute('value', 'Facebook');
+                  typesContact[i].textContent = 'Facebook';
+                  break;
+                case 3:
+                  typesContact[i].setAttribute('value', 'VK');
+                  typesContact[i].textContent = 'VK';
+                  break;
+                case 4:
+                  typesContact[i].setAttribute('value', 'Другое');
+                  typesContact[i].textContent = 'Другое';
+                  break;
+              };
+            };
+            clientsContactNew.append(valueContact);
+            clientsContactNew.append(btnDelContact);
+            // Удалить контакт
+            btnDelContact.onclick = () => {
+              if (document.querySelectorAll('.wrap-change__contact').length === 10) {
+                addContactButton.classList.remove('hidden');
+              };
+              clientsContactNew.remove();
+              if (document.querySelectorAll('.wrap-change__contact').length === 0) {
+                document.querySelector('.wrap-change__contacts').classList.add('hidden');
+              };
+            };
+            tippy(btnDelContact, {
+              content: 'Удалить контакт',
+              appendTo: document.querySelector('.clients__dialog_change'),
+            });
+            customizeSelect(typeContact);
+            let contactsElements = document.querySelectorAll('.wrap-change__contact');
+            if (contactsElements.length === 10) {
+              addContactButton.classList.add('hidden');
+            };
+          };
+        };
+        // Сохранить
+        let changeButton = document.querySelector('.dialog__button_change');
+        if (changeButton) {
+          changeButton.onclick = () => {
+            changeButton.disabled = true;
+            let errorElement = document.querySelector('.dialog__errors_change');
+            let loadingIcon = document.querySelector('.button-save__loading');
+            loadingIcon.classList.remove('hidden');
+            let arrOfChangeContacts = [];
+            let elementsOfNewContact = document.querySelectorAll('.wrap-change__contact');
+            if (elementsOfNewContact.length) {
+              for (let i = 0; i < elementsOfNewContact.length; i++) {
+                arrOfChangeContacts[i] = {
+                  'type': String(elementsOfNewContact[i].querySelector('option').value),
+                  'value': String(elementsOfNewContact[i].querySelector('input').value),
+                };
+              };
+            };
+            let clientNewData = {
+              'name': `${inputName.value}`,
+              'surname': `${inputSurname.value}`,
+              'lastName': `${inputLastName.value}`,
+              'contacts': arrOfChangeContacts,
+            };
+            toChangeClient(client, clientNewData)
+              .then(async (resp) => {
+                if (resp.status !== 422) {
+                  let changedClient = await resp.json();
+                  let indexOfChengedClient = workArr.findIndex(i => i.id === `${requestClient.id}`);
+                  if (Number(indexOfChengedClient) >= 0) {
+                    workArr[indexOfChengedClient].name = changedClient.name;
+                    workArr[indexOfChengedClient].surname = changedClient.surname;
+                    workArr[indexOfChengedClient].lastName = changedClient.lastName;
+                    workArr[indexOfChengedClient].contacts = changedClient.contacts;
+                    workArr[indexOfChengedClient].updatedAt = new Date();
+                    renderArr.forEach((elem) => {
+                      if (elem.id === requestClient.id) {
+                        elem.name = changedClient.name;
+                        elem.surname = changedClient.surname;
+                        elem.lastName = changedClient.lastName;
+                        elem.contacts = changedClient.contacts;
+                        elem.updatedAt = new Date();
+                      };
+                    });
+                    tableView(tbody, workArr, renderArr, {toRequestClient, toChangeClient, toDeleteClient})
+                  };
+                  errorElement.textContent = '';
+                  changeButton.disabled = false;
+                  loadingIcon.classList.add('hidden');
+                  smoothlyClossingDialog('clients__dialog_change');
+                } else {        //ЗДЕСЬ СДЕЛАТЬ ВСЁ ОФОРМЛЕНИЕ ОШИБОК ВАЛИДАЦИИ/ доделать стили ошибок
+                    errorElement.textContent = '';
+                    let respOfErrors = await resp.json();
+                    let arrOfErrors = respOfErrors.errors;
+                    let flag = true;
+                    arrOfErrors.forEach((elem) => {
+                      switch (elem.field) {
+                        case 'name':
+                          errorElement.textContent = errorElement.textContent + elem.message;
+                          console.log(elem.message);
+                          break;
+                        case 'surname':
+                          errorElement.textContent = errorElement.textContent + elem.message;
+                          console.log(elem.message);
+                          break;
+                        case 'contacts':
+                          errorElement.textContent = errorElement.textContent + elem.message;
+                          console.log(elem.message);
+                          break;
+                        default:
+                          errorElement.textContent = 'Что-то пошло не так...';
+                          flag = false;
+                          break;
+                      };
+                    });
+                    changeButton.disabled = false;
+                    loadingIcon.classList.add('hidden');
+                    if (flag) {
+                      throw new Error('Ошибка валидации!');
+                    } else {
+                      throw new Error('Что-то пошло не так...');
+                      };
+                  };
+              })
+              .catch((error) => {
+                console.log(error.message);
+              });
+          };
+        };
+        // Удалить
+        let changeDeleteButton = document.querySelector('.dialog__button_change-del');
+        if (changeDeleteButton) {
+          changeDeleteButton.onclick = () => {
+            deleteClient(workArr, renderArr);
+          };
         };
       };
     };
 
     // Изменение
     toChangeElemCol6.addEventListener('click', () => {
-      openDialogAndLockScroll('clients__dialog_change');
-      // Рендер
-      if (client.contacts.length === 0) {
-        document.querySelector('.wrap-change__contacts').classList.add('hidden');
-      };
-      if (client.contacts.length === 10) {
-        document.querySelector('.wrap-change__add-contact').classList.add('hidden');
-      };
-      let idInTitleDialog = document.querySelector('.dialog__id');
-      let inputName = document.querySelector('.dialog__input-change_name');
-      let inputSurname = document.querySelector('.dialog__input-change_surname');
-      let inputLastName = document.querySelector('.dialog__input-change_lastName');
-      idInTitleDialog.textContent = `ID: ${client.id}`;
-      inputName.value = `${client.name}`;
-      inputSurname.value = `${client.surname}`;
-      inputLastName.value = `${client.lastName}`;
-      if (client.contacts.length) {
-        let clientsContacts = [];
-        for (let i = 0; i < 10; i++) {
-          clientsContacts[i] = document.createElement('div');
+      toChangeElemCol6Icon.classList.add('loading-icon', 'loading-icon_change');
+      toChangeElemCol6Span.classList.add('loading-text-change');
+      document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+        if (elem) {
+          elem.disabled = true;
         };
-        for (let i = 0; i < client.contacts.length; i++) {
-          document.querySelector('.wrap-change__contacts').append(clientsContacts[i]);
-          clientsContacts[i].classList.add('wrap-change__contact', 'contact', 'flex');
-          let typeContact = document.createElement('select');
-          let typesContact = [];
-          for (let index = 0; index < 5; index++) {
-            typesContact[index] = document.createElement('option');
-          };
-          let valueContact = document.createElement('input');
-          let btnDelContact = document.createElement('button');
-          clientsContacts[i].append(typeContact);
-          for (let index = 0; index < 5; index++) {
-            typeContact.append(typesContact[index]);
-            typesContact[index].classList.add('contact__type-option');
-            switch (index) {
-              case 0:
-                typesContact[index].setAttribute('value', 'Телефон');
-                typesContact[index].textContent = 'Телефон';
-                if (client.contacts[i]['type'] === 'Телефон') {
-                  typesContact[index].setAttribute('selected', 'true');
-                };
-                break;
-              case 1:
-                typesContact[index].setAttribute('value', 'Доп.телефон');
-                typesContact[index].textContent = 'Доп. телефон';
-                if (client.contacts[i]['type'] === 'Доп.телефон') {
-                  typesContact[index].setAttribute('selected', 'true');
-                };
-                break;
-              case 2:
-                typesContact[index].setAttribute('value', 'Email');
-                typesContact[index].textContent = 'Email';
-                if (client.contacts[i]['type'] === 'Email') {
-                  typesContact[index].setAttribute('selected', 'true');
-                };
-                break;
-              case 3:
-                typesContact[index].setAttribute('value', 'VK');
-                typesContact[index].textContent = 'VK';
-                if (client.contacts[i]['type'] === 'VK') {
-                  typesContact[index].setAttribute('selected', 'true');
-                };
-                break;
-              case 4:
-                typesContact[index].setAttribute('value', 'Facebook');
-                typesContact[index].textContent = 'Facebook';
-                if (client.contacts[i]['type'] === 'Facebook') {
-                  typesContact[index].setAttribute('selected', 'true');
-                };
-                break;
-              default:
-                typesContact[index].setAttribute('value', 'Доп.телефон');
-                typesContact[index].textContent = 'Доп. телефон';
-                typesContact[index].setAttribute('selected', 'true');
-                break;
-            };
-          };
-          typeContact.classList.add('contact__type');
-          valueContact.classList.add('contact__value');
-          btnDelContact.classList.add('contact__btn-del', 'btn-reset');
-          clientsContacts[i].append(valueContact);
-          clientsContacts[i].append(btnDelContact);
-          tippy(btnDelContact, {
-            content: 'Удалить контакт',
-            appendTo: document.querySelector('.clients__dialog_change'),
-          });
-          // Удалить контакт
-          btnDelContact.onclick = () => {
-            if (document.querySelectorAll('.wrap-change__contact').length === 10) {
-              addContactButton.classList.remove('hidden');
-            };
-            clientsContacts[i].remove();
-            if (document.querySelectorAll('.wrap-change__contact').length === 0) {
-              document.querySelector('.wrap-change__contacts').classList.add('hidden');
-            };
-          };
-          valueContact.value = `${client.contacts[i]['value']}`
-        };
-      };
-      // select
-      let customSelectArr = document.querySelectorAll('.contact__type');
-      customSelectArr.forEach((elem) => {
-        customizeSelect(elem);
       });
-      // Добавить контакт
-      let addContactButton = document.querySelector('.wrap-change__add-contact');
-      if (addContactButton) {
-        addContactButton.onclick = () => {
-          if ((client.contacts.length === 0) || (document.querySelectorAll('.wrap-change__contact').length === 0) ) {
-            document.querySelector('.wrap-change__contacts').classList.remove('hidden');
-          };
-          let clientsContactNew = document.createElement('div');
-          let typeContact = document.createElement('select');
-          let typesContact = [];
-          for (let i = 0; i < 5; i++) {
-            typesContact[i] = document.createElement('option');
-          };
-          let valueContact = document.createElement('input');
-          let btnDelContact = document.createElement('button');
-          clientsContactNew.classList.add('wrap-change__contact', 'contact', 'flex');
-          typeContact.classList.add('contact__type');
-          valueContact.classList.add('contact__value');
-          btnDelContact.classList.add('contact__btn-del', 'btn-reset');
-          document.querySelector('.wrap-change__contacts').append(clientsContactNew);
-          clientsContactNew.append(typeContact);
-          for (let i = 0; i < 5; i++) {
-            typeContact.append(typesContact[i]);
-            typesContact[i].classList.add('contact__type-option');
-            switch (i) {
-              case 0:
-                typesContact[i].setAttribute('value', 'Телефон');
-                typesContact[i].textContent = 'Телефон';
-                break;
-              case 1:
-                typesContact[i].setAttribute('value', 'Доп.телефон');
-                typesContact[i].textContent = 'Доп. телефон';
-                break;
-              case 2:
-                typesContact[i].setAttribute('value', 'Email');
-                typesContact[i].textContent = 'Email';
-                break;
-              case 3:
-                typesContact[i].setAttribute('value', 'VK');
-                typesContact[i].textContent = 'VK';
-                break;
-              case 4:
-                typesContact[i].setAttribute('value', 'Facebook');
-                typesContact[i].textContent = 'Facebook';
-                break;
-            };
-          };
-          clientsContactNew.append(valueContact);
-          clientsContactNew.append(btnDelContact);
-          // Удалить контакт
-          btnDelContact.onclick = () => {
-            if (document.querySelectorAll('.wrap-change__contact').length === 10) {
-              addContactButton.classList.remove('hidden');
-            };
-            clientsContactNew.remove();
-            if (document.querySelectorAll('.wrap-change__contact').length === 0) {
-              document.querySelector('.wrap-change__contacts').classList.add('hidden');
-            };
-          };
-          tippy(btnDelContact, {
-            content: 'Удалить контакт',
-            appendTo: document.querySelector('.clients__dialog_change'),
-          });
-          customizeSelect(typeContact);
-          let contactsElements = document.querySelectorAll('.wrap-change__contact');
-          if (contactsElements.length === 10) {
-            addContactButton.classList.add('hidden');
-          };
+      document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+        if (elem) {
+          elem.disabled = true;
         };
-      };
-      // Сохранить
-      let changeButton = document.querySelector('.dialog__button_change');
-      if (changeButton) {
-        changeButton.onclick = () => {
-          let arrOfChangeContacts = [];
-          let elementsOfNewContact = document.querySelectorAll('.wrap-change__contact');
-          if (elementsOfNewContact.length) {
-            for (let i = 0; i < elementsOfNewContact.length; i++) {
-              arrOfChangeContacts[i] = {
-                'type': String(elementsOfNewContact[i].querySelector('option').value),
-                'value': String(elementsOfNewContact[i].querySelector('input').value),
-              };
-            };
-          };
-          let clientNewData = {
-            'name': `${inputName.value}`,
-            'surname': `${inputSurname.value}`,
-            'lastName': `${inputLastName.value}`,
-            'contacts': arrOfChangeContacts,
-          };
-          toChangeClient(client, clientNewData);
-          let indexOfChengedClient = workArr.findIndex(i => i.id === `${client.id}`);
-          if (Number(indexOfChengedClient) >= 0) {
-            workArr[indexOfChengedClient].name = clientNewData.name;
-            workArr[indexOfChengedClient].surname = clientNewData.surname;
-            workArr[indexOfChengedClient].lastName = clientNewData.lastName;
-            workArr[indexOfChengedClient].contacts = clientNewData.contacts;
-            workArr[indexOfChengedClient].updatedAt = new Date();
-            tableView(tbody, [], workArr, {toChangeClient, toDeleteClient})
-          };
-          smoothlyClossingDialog('clients__dialog_change');
-        };
-      };
-      // Удалить
-      let changeDeleteButton = document.querySelector('.dialog__button_change-del');
-      if (changeDeleteButton) {
-        changeDeleteButton.onclick = () => {
-          deleteClient();
-        };
-      };
+      });
+      document.querySelector('.clients__add-btn').disabled = true;
+      changeClient(workArr, renderArr);
     });
 
     // Удаление
     toDeleteElemCol6.addEventListener('click', () => {
-      deleteClient();
+      toDeleteElemCol6Icon.classList.add('loading-icon', 'loading-icon_delete');
+      toDeleteElemCol6Span.classList.add('loading-text-delete');
+      document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+        if (elem) {
+          elem.disabled = true;
+        };
+      });
+      document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+        if (elem) {
+          elem.disabled = true;
+        };
+      });
+      document.querySelector('.clients__add-btn').disabled = true;
+      deleteClient(workArr, renderArr);
     });
 
     return {
@@ -494,20 +740,19 @@
     };
   };
 
-  function tableView(tbody, arr = [], workArr = [], methods = {}) {
+  // Рендер таблицы
+  function tableView(tbody, workArr = [], renderArr = [], methods = {}) {
     tbody.querySelectorAll('tr').forEach((el) => {
       el.remove();
     });
-    if (workArr.length) {
-      for (let client of workArr) {
-        tbody.append(getClient(client, methods, arr, workArr).row);
+    if (renderArr.length) {
+      for (let client of renderArr) {
+        tbody.append(getClient(client, methods, workArr, renderArr).row);
         // Тултипы
         document.querySelectorAll('.table__tbody tr:last-of-type .table__elemCol5').forEach((element, index) => {
           if (!element.classList.contains('table__elemCol5_collapse')) {
             tippy(element, {
               content: `${client.contacts[index]['type']}: ${client.contacts[index]['value']}`,
-              hideOnClick: true,
-              trigger: 'click',
             });
           };
         });
@@ -527,21 +772,24 @@
     };
   };
 
+  // Приложение
   async function skillbusApp(tbody, addBtn) {
-    let response = await fetch(URL)
-          .catch((error) => {
-            tbody.querySelector('.table__loading-img').remove();
-            if (error.message === 'Failed to fetch') {
-              tbody.querySelector('.table__td_default').textContent = `Ошибка: сервер не отвечает`;
-            } else {
-                tbody.querySelector('.table__td_default').textContent = `Ошибка: ${error.message}`;
-              };
-            console.log(`Ошибка: ${error.message}`)
-          });
-    let clientsList = await response.json();
+    // Загрузка таблицы
+    const ERR = 'Что-то пошло не так...';
+    let workArr = [];
+    let sortArr = [];
     let methods = {
-      toChangeClient(clientItem, clientNewData) {
-        fetch(`${URL}${clientItem.id}`, {
+      async toRequestClient(clientItem) {
+        return await fetch(`${URL}${clientItem.id}`)
+                        .then((resp) => {
+                          return resp.json();
+                        })
+                        .catch((error) => {
+                          console.log(`Ошибка: ${error.message}`);
+                        });
+      },
+      async toChangeClient(clientItem, clientNewData) {
+        return await fetch(`${URL}${clientItem.id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -552,7 +800,15 @@
             lastName: clientNewData.lastName,
             contacts: clientNewData.contacts,
           }),
-        });
+        })
+        // .then((resp) => {
+        //   console.log(resp)
+        //   return resp;
+        // })
+        // .catch((error) => {
+        //   console.log(error.message)
+        //   return error
+        // });
       },
       toDeleteClient(clientItem) {
         fetch(`${URL}${clientItem.id}`, {
@@ -560,125 +816,132 @@
         });
       },
     };
-    tableView(tbody, [], clientsList, methods);
 
-    addBtn.addEventListener('click', async () => {
-      openDialogAndLockScroll('clients__dialog_new');
+    await fetch(URL)
+      .then(async (resp) => {
+        if (resp.status === 200) {
+          let clientsList = await resp.json();
+          workArr = [...clientsList];
+          sortArr = [...clientsList];
+          tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
+        } else {
+            throw new Error(ERR);
+          };
+      })
+      .catch((error) => {
+        tbody.querySelector('.table__loading-img').remove();
+        tbody.querySelector('.table__td_default').textContent = ERR;
+        console.log(`Ошибка: ${error.message}`)
+      });
+
+    // Добавление клиента
+    addBtn.onclick = () => {
+      addClientWindowOpen();
       let dataNewClient = {};
       let arrNewContacts = [];
+      let addClientBtn = document.querySelector('.dialog__button_new');
       let inputName = document.querySelector('.dialog__input-new_name');
       let inputSurname = document.querySelector('.dialog__input-new_surname');
       let inputLastName = document.querySelector('.dialog__input-new_lastName');
-      let saveNewClientBtn = document.querySelector('.dialog__button_new');
+      addClientBtn.onclick = async () => {
 
-// Добавление контактов НЕ РАБОТАЕТ
-      let addContactButton = document.querySelector('.wrap-new__add-contact');
-      if (addContactButton) {
-        addContactButton.onclick = () => {
-          if (document.querySelectorAll('.wrap-new__contact').length === 0) {
-            document.querySelector('.wrap-change__contacts').classList.remove('hidden');
-          };
-          let clientsContactNew = document.createElement('div');
-          let typeContact = document.createElement('select');
-          let typesContact = [];
-          for (let i = 0; i < 5; i++) {
-            typesContact[i] = document.createElement('option');
-          };
-          let valueContact = document.createElement('input');
-          let btnDelContact = document.createElement('button');
-          clientsContactNew.classList.add('wrap-new__contact', 'contact', 'flex');
-          typeContact.classList.add('contact__type');
-          valueContact.classList.add('contact__value');
-          btnDelContact.classList.add('contact__btn-del', 'btn-reset');
-          document.querySelector('.wrap-new__contacts').append(clientsContactNew);
-          clientsContactNew.append(typeContact);
-          for (let i = 0; i < 5; i++) {
-            typeContact.append(typesContact[i]);
-            typesContact[i].classList.add('contact__type-option');
-            switch (i) {
-              case 0:
-                typesContact[i].setAttribute('value', 'Телефон');
-                typesContact[i].textContent = 'Телефон';
-                break;
-              case 1:
-                typesContact[i].setAttribute('value', 'Доп.телефон');
-                typesContact[i].textContent = 'Доп. телефон';
-                break;
-              case 2:
-                typesContact[i].setAttribute('value', 'Email');
-                typesContact[i].textContent = 'Email';
-                break;
-              case 3:
-                typesContact[i].setAttribute('value', 'VK');
-                typesContact[i].textContent = 'VK';
-                break;
-              case 4:
-                typesContact[i].setAttribute('value', 'Facebook');
-                typesContact[i].textContent = 'Facebook';
-                break;
+        // if валидация
+
+        let arrElementsOfContacts = document.querySelectorAll('.wrap-new__contact');
+        if (arrElementsOfContacts.length) {
+          for (let i = 0; i < arrElementsOfContacts.length; i++) {
+            arrNewContacts[i] = {
+              'type': String(arrElementsOfContacts[i].querySelector('option').value),
+              'value': String(arrElementsOfContacts[i].querySelector('input').value),
             };
-          };
-          clientsContactNew.append(valueContact);
-          clientsContactNew.append(btnDelContact);
-          // Удалить контакт
-          btnDelContact.onclick = () => {
-            if (document.querySelectorAll('.wrap-new__contact').length === 10) {
-              addContactButton.classList.remove('hidden');
-            };
-            clientsContactNew.remove();
-            if (document.querySelectorAll('.wrap-change__contact').length === 0) {
-              document.querySelector('.wrap-change__contacts').classList.add('hidden');
-            };
-          };
-          tippy(btnDelContact, {
-            content: 'Удалить контакт',
-            appendTo: document.querySelector('.clients__dialog_new'),
-          });
-          customizeSelect(typeContact);
-          let contactsElements = document.querySelectorAll('.wrap-change__contact');
-          if (contactsElements.length === 10) {
-            addContactButton.classList.add('hidden');
           };
         };
+        dataNewClient = {
+          'name': `${inputName.value}`,
+          'surname': `${inputSurname.value}`,
+          'lastName': `${inputLastName.value}`,
+          'contacts': arrNewContacts,
+        };
+        let response = await fetch(URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataNewClient),
+        });
+        let newClient = await response.json();
+        workArr.push(newClient);
+        sortArr.splice(0);
+        sortArr = [...workArr];
+        tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
+        addClientWindowClose();
       };
+    };
 
-
-      if (saveNewClientBtn) {
-        saveNewClientBtn.onclick = async () => {
-          // if ВАЛИДАЦИЯ
-          dataNewClient = {
-            'name': `${inputName.value}`,
-            'surname': `${inputSurname.value}`,
-            'lastName': `${inputLastName.value}`,
-            'contacts': arrNewContacts,
-          };
-          let response = await fetch(URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataNewClient),
-          });
-          let newClient = await response.json();
-          clientsList.push(newClient);
-          tableView(tbody, [], clientsList, methods);
-          inputName.value = '';
-          inputSurname.value = '';
-          inputLastName.value = '';
-          let contacts = document.querySelector('.wrap-new__contacts');
-          if (contacts) {
-            contacts.innerHTML = '';
-          };
-          let inputsNew = document.querySelectorAll('.label__descr_new');
-          inputsNew.forEach((elem) => {
-            elem.classList.remove('label__descr_new-filled');
-          });
-          smoothlyClossingDialog('clients__dialog_new');
+    // Сортировка
+    let sortFields = document.querySelectorAll('.table__th_sort');
+    let reversId = true;
+    let reversFio = false;
+    let reversCreated = false;
+    let reversChanged = false;
+    sortFields.forEach((th_cell) => {
+      if (th_cell.getAttribute('data-path') === '0') {
+        th_cell.firstElementChild.style.setProperty('--angle-sort', '0deg');
+      } else {
+          th_cell.firstElementChild.style.setProperty('--angle-sort', '180deg');
         };
+      if (th_cell.getAttribute('data-path') === '1') {
+        th_cell.lastElementChild.style.setProperty('--word-sort', 'А-Я');
       };
     });
-  };
+    sortFields.forEach((th_cell) => {
+      th_cell.addEventListener('click', () => {
+        let angleSortValue = String(th_cell.firstElementChild.style.getPropertyValue('--angle-sort'));
+        (angleSortValue !== '180deg') ? th_cell.firstElementChild.style.setProperty('--angle-sort', '180deg') : th_cell.firstElementChild.style.setProperty('--angle-sort', '0deg');
+        if (th_cell.getAttribute('data-path') === '1') {
+          let wordSortValue = String(th_cell.lastElementChild.style.getPropertyValue('--word-sort'));
+          (wordSortValue !== 'Я-А') ? th_cell.lastElementChild.style.setProperty('--word-sort', 'Я-А') : th_cell.lastElementChild.style.setProperty('--word-sort', 'А-Я');
+          th_cell.lastElementChild.textContent = th_cell.lastElementChild.style.getPropertyValue('--word-sort');
+        };
+        switch (th_cell.getAttribute('data-path')) {
+          case '0':
+            sort(sortArr, `${sortData[th_cell.getAttribute('data-path')]}`, reversId);
+            reversId = !reversId;
+            break;
+          case '1':
+            sortByFIO(sortArr, 'surname', 'name', 'lastName', reversFio);
+            reversFio = !reversFio;
+            break;
+          case '2':
+            sort(sortArr, `${sortData[th_cell.getAttribute('data-path')]}`, reversCreated);
+            reversCreated = !reversCreated;
+            break;
+          case '3':
+            sort(sortArr, `${sortData[th_cell.getAttribute('data-path')]}`, reversChanged);
+            reversChanged = !reversChanged;
+            break;
+          default:
+            sort(sortArr, 'id', false);
+            reversId = !reversId;
+            break;
+        };
+        tableView(tbody, workArr, sortArr, methods);
+      });
+    });
 
+    // Поиск
+    let searchInput = document.querySelector('.header__search');
+    searchInput.addEventListener('input', () => {
+      setTimeout(async () => {
+        let response = await fetch(`${URL}?search=${String(searchInput.value)}`);
+        let searchArr = await response.json();
+        sortArr.splice(0);
+        sortArr = [...searchArr];
+        tableView(tbody, workArr, sortArr, methods);
+      }, 300);
+    });
+
+  };
   window.createSkillbusApp = skillbusApp;
 })();
 

@@ -236,7 +236,6 @@ body {
 }
 
 .header__search::placeholder {
-  padding-left: 13px;
   font-size: 14px;
   line-height: 19px;
   color: var(--color-text-gray);
@@ -275,6 +274,13 @@ body {
   border: none;
 }
 
+.table__th_id,
+.table__th_fio,
+.table__th_created,
+.table__th_changed {
+  cursor: pointer;
+}
+
 .table__th_id {
   width: 125px;
   padding-left: 20px;
@@ -292,11 +298,12 @@ body {
 }
 
 .table__th_does {
-  width: 230px;
+  width: 200px;
 }
 
 .table__span-id {
   position: relative;
+  --angle-sort: 0deg;
 }
 
 .table__span-id::after {
@@ -311,13 +318,15 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  rotate: var(--angle-sort);
 }
 
 .table__span-fio {
   position: relative;
+  --angle-sort: 180deg;
 }
 
-.table__span-fio::before {
+.table__span-fio::after {
   content: "";
   position: absolute;
   top: 20%;
@@ -329,24 +338,21 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
-  transform: rotate(180deg);
+  rotate: var(--angle-sort);
 }
 
-.table__span-fio::after {
-  content: "А-Я";
-  position: absolute;
-  top: 20%;
-  left: 108%;
-  display: block;
-  width: 29px;
-  height: 12px;
+.table__span-sort {
+  display: inline-block;
+  padding-left: 10px;
   font-size: 10px;
   line-height: 14px;
   color: var(--color-interactive-elements);
+  --word-sort: 'А-Я';
 }
 
 .table__span-created {
   position: relative;
+  --angle-sort: 180deg;
 }
 
 .table__span-created::after {
@@ -361,11 +367,12 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  transform: rotate(180deg);
+  rotate: var(--angle-sort);
 }
 
 .table__span-changed {
   position: relative;
+  --angle-sort: 180deg;
 }
 
 .table__span-changed::after {
@@ -380,7 +387,7 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  transform: rotate(180deg);
+  rotate: var(--angle-sort);
 }
 
 .table__tr {
@@ -428,21 +435,32 @@ body {
 
 .table__toChangeElemCol6,
 .table__toDeleteElemCol6 {
-  padding-left: 18px;
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: contain;
-}
-
-.table__toChangeElemCol6 {
-  background-image: url(../img/does-change.svg);
+  align-items: stretch;
 }
 
 .table__toChangeElemCol6:hover {
   color: var(--color-interactive-elements);
 }
 
-.table__toDeleteElemCol6 {
+.table__toChangeElemCol6:disabled,
+.table__toDeleteElemCol6:disabled {
+  pointer-events: none;
+}
+
+.table__toChangeElemCol6Icon,
+.table__toDeleteElemCol6Icon {
+  width: 16px;
+  background-image: url(../img/does-change.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.table__toChangeElemCol6Icon {
+  background-image: url(../img/does-change.svg);
+}
+
+.table__toDeleteElemCol6Icon {
   background-image: url(../img/does-delete.svg);
 }
 
@@ -530,6 +548,13 @@ body {
   color: var(--color-white);
   background-color: var(--color-interactive-elements_active);
   background-image: url(../img/add-btn_hover.svg);
+}
+
+.clients__add-btn:disabled {
+  color: var(--color-border-table);
+  background-image: url(../img/add-btn_disabled.svg);
+  border: 1px solid var(--color-border-table);
+  pointer-events: none;
 }
 
 .dialog {
@@ -804,6 +829,47 @@ body {
 
 .dialog__button_close:active svg path {
   fill: var(--color-interactive-elements_active);
+}
+
+.button-save {
+  align-items: center;
+  gap: 4px;
+}
+
+.button-save:disabled {
+  pointer-events: none;
+}
+
+.button-save__loading {
+  width: 18px;
+  height: 18px;
+  background-image: url(../img/loading-button_save.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  animation: 1s linear infinite normal loading;
+}
+
+.loading-icon {
+  width: 16px;
+  height: 16px;
+  animation: 1s linear infinite normal loading;
+}
+
+.loading-icon_change {
+  background-image: url(../img/loading-button_change.svg);
+}
+
+.loading-icon_delete {
+  background-image: url(../img/loading-button_delete.svg);
+}
+
+.loading-text-change {
+  color: var(--color-interactive-elements);
+}
+
+.loading-text-delete {
+  color: var(--color-red_hover);
 }
 
 /* @media (max-width: 1254px) {
