@@ -37,18 +37,26 @@
         <table class="clients__table table">
           <thead class="table__thead">
             <tr class="table__tr-th">
-              <th class="table__th table__th_sort table__th_id" scope="col" data-path="0">
-                <span class="table__span-id">ID</span>
+              <th class="table__th table__th_sort table__th_id" scope="col">
+                <button class="table__th-btn table__th-btn_id btn-reset" data-path="0">
+                  <span class="table__span-id">ID</span>
+                </button>
               </th>
-              <th class="table__th table__th_sort table__th_fio" scope="col" data-path="1">
-                <span class="table__span-fio">Фамилия Имя Отчество</span>
-                <span class="table__span-sort">А-Я</span>
+              <th class="table__th table__th_sort table__th_fio" scope="col">
+                <button class="table__th-btn btn-reset" data-path="1">
+                  <span class="table__span-fio">Фамилия Имя Отчество</span>
+                  <span class="table__span-sort">А-Я</span>
+                </button>
               </th>
-              <th class="table__th table__th_sort table__th_created" scope="col" data-path="2">
-                <span class="table__span-created">Дата и время создания</span>
+              <th class="table__th table__th_sort table__th_created" scope="col">
+                <button class="table__th-btn btn-reset" data-path="2">
+                  <span class="table__span-created">Дата и время создания</span>
+                </button>
               </th>
-              <th class="table__th table__th_sort table__th_changed" scope="col" data-path="3">
-                <span class="table__span-changed">Последние изменения</span>
+              <th class="table__th table__th_sort table__th_changed" scope="col">
+                <button class="table__th-btn btn-reset" data-path="3">
+                  <span class="table__span-changed">Последние изменения</span>
+                </button>
               </th>
               <th class="table__th table__th_contacts" scope="col" data-path="4">Контакты</th>
               <th class="table__th table__th_does" scope="col" data-path="5">Действия</th>
@@ -122,18 +130,18 @@
                     Фамилия
                     <span class="label__simbol">*</span>
                   </span>
-                  <input class="dialog__input dialog__input-change_surname" type="text">
+                  <input class="dialog__input dialog__input-change dialog__input-change_surname" type="text">
                 </label>
                 <label class="dialog__label label">
                   <span class="label__descr">
                     Имя
                     <span class="label__simbol">*</span>
                   </span>
-                  <input class="dialog__input dialog__input-change_name" type="text">
+                  <input class="dialog__input dialog__input-change dialog__input-change_name" type="text">
                 </label>
                 <label class="dialog__label label">
                   <span class="label__descr">Отчество</span>
-                  <input class="dialog__input dialog__input-change_lastName" type="text">
+                  <input class="dialog__input dialog__input-change dialog__input-change_lastName" type="text">
                 </label>
               </div>
             </div>
@@ -162,9 +170,13 @@
           <div class="dialog__wrap dialog__wrap_delete flex">
             <h3 class="dialog__title dialog__title_delete">Удалить клиента</h3>
             <span class="dialog__deskr">Вы действительно хотите удалить данного клиента?</span>
-            <button class="dialog__button dialog__button_del btn-reset" type="button">Удалить</button>
-            <button class="dialog__button dialog__button_cancel btn-reset" type="button">Отмена</button>
-            <button class="dialog__button_close btn-reset">
+            <div class="dialog__errors dialog__errors_del"></div>
+            <button class="dialog__button dialog__button_del button-del flex btn-reset" type="button">
+              <span class="button-del__loading hidden"></span>
+              <span class="button-del__text">Удалить</span>
+            </button>
+            <button class="dialog__button dialog__button_cancel dialog__button_cancel-del btn-reset" type="button">Отмена</button>
+            <button class="dialog__button_close dialog__button_close-del btn-reset">
               <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M22.2332 7.73333L21.2665 6.76666L14.4998 13.5334L7.73318 6.7667L6.76652 7.73336L13.5332 14.5L6.76654 21.2667L7.73321 22.2333L14.4998 15.4667L21.2665 22.2334L22.2332 21.2667L15.4665 14.5L22.2332 7.73333Z" fill="#b0b0b0"/>
               </svg>

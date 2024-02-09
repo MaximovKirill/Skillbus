@@ -265,32 +265,27 @@ body {
 }
 
 .table__th {
+  position: relative;
+  border: none;
+}
+
+.table__th_id {
+  width: 125px;
+}
+
+.table__th_created,
+.table__th_changed {
+  width: 150px;
+}
+
+.table__th_contacts,
+.table__th_does {
   padding-right: 14px;
   padding-left: 14px;
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
   color: var(--color-text-gray);
-  border: none;
-}
-
-.table__th_id,
-.table__th_fio,
-.table__th_created,
-.table__th_changed {
-  cursor: pointer;
-}
-
-.table__th_id {
-  width: 125px;
-  padding-left: 20px;
-  padding-right: 44px;
-  color: var(--color-interactive-elements);
-}
-
-.table__th_created,
-.table__th_changed {
-  width: 150px;
 }
 
 .table__th_contacts {
@@ -304,6 +299,27 @@ body {
 .table__span-id {
   position: relative;
   --angle-sort: 0deg;
+}
+
+.table__th-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding-right: 14px;
+  padding-left: 14px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left;
+  color: var(--color-text-gray);
+}
+
+.table__th-btn_id {
+  padding-left: 20px;
+  padding-right: 44px;
+  color: var(--color-interactive-elements);
 }
 
 .table__span-id::after {
@@ -765,7 +781,6 @@ body {
 }
 
 .dialog__deskr {
-  padding-bottom: 25px;
   text-align: center;
 }
 
@@ -841,11 +856,13 @@ body {
   gap: 4px;
 }
 
-.button-save:disabled {
+.button-save:disabled,
+.button-del:disabled {
   pointer-events: none;
 }
 
-.button-save__loading {
+.button-save__loading,
+.button-del__loading {
   width: 18px;
   height: 18px;
   background-image: url(../img/loading-button_save.svg);
@@ -881,7 +898,7 @@ body {
   padding: 15px 25px;
   color: var(--color-red_hover);
   font-size: 10px;
-  line-height: 10px;
+  line-height: 0px;
   text-align: center;
 }
 

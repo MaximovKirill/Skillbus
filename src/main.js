@@ -77,6 +77,39 @@
     };
   };
 
+  // Функция сброса диалоговых окон
+  function resetDialog(dialogClass) {
+    switch (dialogClass) {
+      case 'clients__dialog_new':
+        document.querySelectorAll('.dialog__input-new').forEach((el) => {
+          el.value = '';
+        });
+        document.querySelector(`.${dialogClass} .wrap-new__contacts`).innerHTML = '';
+        document.querySelectorAll('.label__descr').forEach((elem) => {
+          elem.classList.remove('label__descr_filled');
+        });
+        document.querySelector('.wrap-new__contacts').classList.add('hidden');
+        document.querySelector('.wrap-new__add-contact').classList.remove('hidden');
+        document.querySelector('.dialog__errors_new').textContent = '';
+      break;
+      case 'clients__dialog_change':
+        document.querySelector(`.${dialogClass} .wrap-change__contacts`).innerHTML = '';
+        document.querySelectorAll('.label__descr').forEach((elem) => {
+          elem.classList.remove('label__descr_filled');
+        });
+        document.querySelector('.wrap-change__contacts').classList.remove('hidden');
+        document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
+        document.querySelector('.dialog__errors_change').textContent = '';
+      break;
+      case 'clients__dialog_delete':
+        document.querySelector('.dialog__errors_del').textContent = '';
+      break;
+    };
+    document.querySelectorAll('.dialog__input').forEach((el) => {
+      el.classList.remove('dialog__input_invalid');
+    });
+  };
+
   // Плавное закрытие диалоговых окон
   function smoothlyClossingDialog(dialogClass) {
     let dialogWindow = document.querySelector(`.${dialogClass}`);
@@ -87,34 +120,8 @@
         dialogWindow.classList.remove('clossing');
         dialogWindow.close();
         document.body.classList.remove('scroll-lock');
-        // Очистка полей в окне Новый клиент
-        document.querySelectorAll('.dialog__input-new').forEach((el) => {
-          el.value = '';
-        });
-        // Удаление контактов в окне Изменение
-        let contactsChange = document.querySelector(`.${dialogClass} .wrap-change__contacts`);
-        if (contactsChange) {
-          contactsChange.innerHTML = '';
-        };
-        let contactsNew = document.querySelector(`.${dialogClass} .wrap-new__contacts`);
-        if (contactsNew) {
-          contactsNew.innerHTML = '';
-        };
-        if (!(dialogClass === 'clients__dialog_delete')) {
-          document.querySelectorAll('.label__descr').forEach((elem) => {
-            elem.classList.remove('label__descr_filled');
-          });
-        };
-        document.querySelector('.wrap-change__contacts').classList.remove('hidden');
-        document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
-        document.querySelector('.wrap-new__contacts').classList.add('hidden');
-        document.querySelector('.wrap-new__add-contact').classList.remove('hidden');
-        // Удаление сообщений ошибок валидации
-        document.querySelector('.dialog__errors_new').textContent = '';
-        document.querySelector('.dialog__errors_change').textContent = '';
-        document.querySelectorAll('.dialog__input').forEach((el) => {
-          el.classList.remove('dialog__input_invalid');
-        });
+        // Сброс диалоговых окон в зависимости от содержимого
+        resetDialog(dialogClass);
       }, 200);
     };
   };
@@ -123,37 +130,16 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       // smoothlyClossingDialog(); не срабатывает
-      if ((document.querySelector('.clients__dialog_new[open]') || document.querySelector('.clients__dialog_change[open]')) && !document.querySelector('.clients__dialog_delete[open]')) {
-        document.body.classList.remove('scroll-lock');
-        document.querySelectorAll('.label__descr').forEach((elem) => {
-          elem.classList.remove('label__descr_filled');
-        });
-        // Очистка полей в окне Новый клиент
-        document.querySelectorAll('.dialog__input-new').forEach((el) => {
-          el.value = '';
-        });
-        // Удаление контактов в окне Изменение
-        let contactsChange = document.querySelector('.clients__dialog_change .wrap-change__contacts');
-        if (contactsChange) {
-          contactsChange.innerHTML = '';
-        };
-        let contactsNew = document.querySelector('.clients__dialog_new .wrap-new__contacts');
-        if (contactsNew) {
-          contactsNew.innerHTML = '';
-        };
-        document.querySelector('.wrap-change__contacts').classList.remove('hidden');
-        document.querySelector('.wrap-change__add-contact').classList.remove('hidden');
-        document.querySelector('.wrap-new__contacts').classList.add('hidden');
-        document.querySelector('.wrap-new__add-contact').classList.remove('hidden');
-        // Удаление сообщений ошибок валидации
-        document.querySelector('.dialog__errors_new').textContent = '';
-        document.querySelector('.dialog__errors_change').textContent = '';
-        document.querySelectorAll('.dialog__input').forEach((el) => {
-          el.classList.remove('dialog__input_invalid');
-        });
-      } else if (!document.querySelector('.clients__dialog_change[open]') && document.querySelector('.clients__dialog_delete[open]')) {
-          document.body.classList.remove('scroll-lock');
-        };
+      let flag = '';
+      document.body.classList.remove('scroll-lock');
+      if (document.querySelector('.clients__dialog_delete[open]')) {
+        flag = 'clients__dialog_delete';
+      } else if (document.querySelector('.clients__dialog_change[open]')) {
+          flag = 'clients__dialog_change';
+        } else if (document.querySelector('.clients__dialog_new[open]')) {
+            flag = 'clients__dialog_new';
+          };
+      resetDialog(flag);
     };
   });
 
@@ -402,6 +388,9 @@
     async function deleteClient(workArr = [], renderArr = []) {
       let requestClient = await toRequestClient(client)
                             .then((prom) => {
+                              if (prom.message === "Client Not Found") {
+                                return false;
+                              };
                               toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
                               toDeleteElemCol6Span.classList.remove('loading-text-delete');
                               document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
@@ -423,20 +412,90 @@
       if (requestClient) {
         openDialogAndLockScroll('clients__dialog_delete');
         let deleteButton = document.querySelector('.dialog__button_del');
+        let cancelDelButton = document.querySelector('.dialog__button_cancel-del');
+        let closeDelButton = document.querySelector('.dialog__button_close-del');
         if (deleteButton) {
-          deleteButton.onclick = () => {
-            toDeleteClient(client);
-            row.remove();
-            let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
-            if (Number(indexOfDeletedClient) >= 0) {
-              workArr.splice(indexOfDeletedClient, 1);
-              renderArr.splice(indexOfDeletedClient, 1);
-            };
-            smoothlyClossingDialog('clients__dialog_delete');
-            smoothlyClossingDialog('clients__dialog_change');
+          deleteButton.onclick = async () => {
+            deleteButton.disabled = true;
+            cancelDelButton.disabled = true;
+            closeDelButton.disabled = true;
+            let loadingIcon = document.querySelector('.button-del__loading');
+            loadingIcon.classList.remove('hidden');
+            await toDeleteClient(client)
+              .then(async (resp) => {
+                if (resp.status !== 404) {
+                  row.remove();
+                  let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+                  if (Number(indexOfDeletedClient) >= 0) {
+                    workArr.splice(indexOfDeletedClient, 1);
+                    renderArr.splice(indexOfDeletedClient, 1);
+                  };
+                  if (document.querySelector('.clients__dialog_change').hasAttribute('open')) {
+                    smoothlyClossingDialog('clients__dialog_delete');
+                    smoothlyClossingDialog('clients__dialog_change');
+                  } else {
+                      smoothlyClossingDialog('clients__dialog_delete');
+                    };
+                  loadingIcon.classList.add('hidden');
+                  deleteButton.disabled = false;
+                  cancelDelButton.disabled = false;
+                  closeDelButton.disabled = false;
+                } else {
+                    let errorElement = document.querySelector('.dialog__errors_del');
+                    errorElement.innerHTML = 'Клиент не найден!';
+                    loadingIcon.classList.add('hidden');
+                    deleteButton.disabled = false;
+                    cancelDelButton.disabled = false;
+                    closeDelButton.disabled = false;
+                };
+              })
+              .catch((error) => {
+                let errorElement = document.querySelector('.dialog__errors_del');
+                errorElement.innerHTML = 'Что-то пошло не так...';
+                loadingIcon.classList.add('hidden');
+                deleteButton.disabled = false;
+                cancelDelButton.disabled = false;
+                closeDelButton.disabled = false;
+                console.log(`Ошибка: ${error.message}`);
+              });
           };
         };
-      };
+      } else if (requestClient === false) {
+          console.log('Клиент не найден!');
+          toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
+          toDeleteElemCol6Span.classList.remove('loading-text-delete');
+          document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+            if (elem) {
+              elem.disabled = false;
+            };
+          });
+          document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+            if (elem) {
+              elem.disabled = false;
+            };
+          });
+          document.querySelector('.clients__add-btn').disabled = false;
+          row.remove();
+          let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+          if (Number(indexOfDeletedClient) >= 0) {
+            workArr.splice(indexOfDeletedClient, 1);
+            renderArr.splice(indexOfDeletedClient, 1);
+          };
+      } else {
+          toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
+          toDeleteElemCol6Span.classList.remove('loading-text-delete');
+          document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+            if (elem) {
+              elem.disabled = false;
+            };
+          });
+          document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+            if (elem) {
+              elem.disabled = false;
+            };
+          });
+          document.querySelector('.clients__add-btn').disabled = false;
+        };
     };
 
     // Изменение
@@ -725,7 +784,10 @@
         let changeDeleteButton = document.querySelector('.dialog__button_change-del');
         if (changeDeleteButton) {
           changeDeleteButton.onclick = () => {
+
+            // если связь не прервалась и нет 404,то, в противном случае показать ошибку в окне Изменение
             deleteClient(workArr, renderArr);
+
           };
         };
       };
@@ -834,8 +896,8 @@
           }),
         });
       },
-      toDeleteClient(clientItem) {
-        fetch(`${URL}${clientItem.id}`, {
+      async toDeleteClient(clientItem) {
+        return await fetch(`${URL}${clientItem.id}`, {
           method: 'DELETE',
         });
       },
@@ -855,7 +917,7 @@
       .catch((error) => {
         document.querySelector('.clients__add-btn').style.display = 'none';
         document.querySelector('.header__search').setAttribute('disabled', 'disabled');
-        document.querySelectorAll('.table__th').forEach((el) => {
+        document.querySelectorAll('.table__th-btn').forEach((el) => {
           el.setAttribute('disabled', 'disabled');
         });
         if (tbody.querySelector('.table__loading-img')) {
@@ -873,8 +935,8 @@
             col.classList.add('table__td', 'table__td_default');
             col.setAttribute('colspan', '6');
             col.textContent = ERR;
-            console.log(`Ошибка: ${error.message}`)
           };
+        console.log(`Ошибка: ${error.message}`);
       });
 
     // Добавление клиента
@@ -958,7 +1020,7 @@
     };
 
     // Сортировка
-    let sortFields = document.querySelectorAll('.table__th_sort');
+    let sortFields = document.querySelectorAll('.table__th-btn');
     let reversId = true;
     let reversFio = false;
     let reversCreated = false;
