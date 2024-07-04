@@ -10,7 +10,7 @@
   <link href="css/style.css" rel="stylesheet">
   <script defer src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
   <script defer src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script defer src="main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -73,7 +73,7 @@
         <button id="addBtn" class="clients__add-btn btn-reset" type="button">Добавить клиента</button>
 
         <dialog class="clients__dialog clients__dialog_new dialog">
-          <div class="dialog__wrap dialog__wrap_new wrap-new">
+          <div class="dialog__wrap dialog__wrap_new wrap-new flex">
             <div class="wrap-new__top flex">
               <div class="dialog__wrap-title">
                 <h3 class="dialog__title dialog__title_new">Новый клиент</h3>
@@ -106,7 +106,10 @@
             </button>
             <div class="dialog__errors dialog__errors_new"></div>
             <div class="wrap-new__bottom flex">
-              <button class="dialog__button dialog__button_new btn-reset" type="button">Сохранить</button>
+              <button class="dialog__button dialog__button_new button-new flex btn-reset" type="button">
+                <span class="button-new__loading hidden"></span>
+                <span class="button-new__text">Сохранить</span>
+              </button>
               <button class="dialog__button dialog__button_cancel btn-reset" type="button">Отмена</button>
             </div>
             <button class="dialog__button_close btn-reset">
@@ -118,7 +121,7 @@
         </dialog>
 
         <dialog class="clients__dialog clients__dialog_change dialog">
-          <div class="dialog__wrap dialog__wrap_change wrap-change">
+          <div class="dialog__wrap dialog__wrap_change wrap-change flex">
             <div class="wrap-change__top flex">
               <div class="dialog__wrap-title">
                 <h3 class="dialog__title dialog__title_change">Изменить данные</h3>
@@ -150,7 +153,7 @@
               <div class="add-contact__plus"></div>
               <span class="add-contact__descr">Добавить контакт</span>
             </button>
-            <div class="dialog__errors dialog__errors_change"></div>
+            <div class="dialog__errors dialog__errors_change flex"></div>
             <div class="wrap-change__bottom flex">
               <button class="dialog__button dialog__button_change button-save flex btn-reset" type="button">
                 <span class="button-save__loading hidden"></span>
@@ -175,8 +178,8 @@
               <span class="button-del__loading hidden"></span>
               <span class="button-del__text">Удалить</span>
             </button>
-            <button class="dialog__button dialog__button_cancel dialog__button_cancel-del btn-reset" type="button">Отмена</button>
-            <button class="dialog__button_close dialog__button_close-del btn-reset">
+            <button class="dialog__button dialog__button_cancel btn-reset" type="button">Отмена</button>
+            <button class="dialog__button_close btn-reset">
               <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M22.2332 7.73333L21.2665 6.76666L14.4998 13.5334L7.73318 6.7667L6.76652 7.73336L13.5332 14.5L6.76654 21.2667L7.73321 22.2333L14.4998 15.4667L21.2665 22.2334L22.2332 21.2667L15.4665 14.5L22.2332 7.73333Z" fill="#b0b0b0"/>
               </svg>

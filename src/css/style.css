@@ -835,6 +835,11 @@ body {
   text-decoration: underline;
 }
 
+.dialog__button_change-del:disabled {
+  text-decoration: none;
+  pointer-events: none;
+}
+
 .dialog__button_close {
   position: absolute;
   top: 15px;
@@ -856,11 +861,14 @@ body {
   gap: 4px;
 }
 
+.dialog__button_new:disabled,
 .button-save:disabled,
 .button-del:disabled {
+  background-color: var(--color-border-table);
   pointer-events: none;
 }
 
+.button-new__loading,
 .button-save__loading,
 .button-del__loading {
   width: 18px;
@@ -895,10 +903,12 @@ body {
 }
 
 .dialog__errors {
+  justify-content: center;
+  align-items: center;
   padding: 15px 25px;
   color: var(--color-red_hover);
   font-size: 10px;
-  line-height: 0px;
+  line-height: 10px;
   text-align: center;
 }
 
