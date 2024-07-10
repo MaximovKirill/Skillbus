@@ -390,106 +390,92 @@
     // Методы
     // Удаление
     async function deleteClient(workArr = [], renderArr = []) {
-      let requestClient = await toRequestClient(client)
-                            .then((prom) => {
-                              toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
-                              toDeleteElemCol6Span.classList.remove('loading-text-delete');
-                              document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
-                                if (elem) {
-                                  elem.disabled = false;
-                                };
-                              });
-                              document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
-                                if (elem) {
-                                  elem.disabled = false;
-                                };
-                              });
-                              document.querySelector('.clients__add-btn').disabled = false;
-                              if (prom.message === "Client Not Found") {
-                                return false;
-                              };
-                              return prom;
-                            })
-                            .catch((error) => {
-                              console.log(`Ошибка: ${error.message}`)
-                            });
-      if (requestClient) {
-        openDialogAndLockScroll('clients__dialog_delete');
-        let deleteButton = document.querySelector('.dialog__button_del');
-        if (deleteButton) {
-          deleteButton.onclick = async () => {
-            deleteButton.disabled = true;
-            let loadingIcon = document.querySelector('.button-del__loading');
-            loadingIcon.classList.remove('hidden');
-            await toDeleteClient(client)
-              .then(async (resp) => {
-                if (resp.status !== 404) {
-                  row.remove();
-                  let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
-                  if (Number(indexOfDeletedClient) >= 0) {
-                    workArr.splice(indexOfDeletedClient, 1);
-                    renderArr.splice(indexOfDeletedClient, 1);
+      await toRequestClient(client)
+              .finally(() => {
+                toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
+                toDeleteElemCol6Span.classList.remove('loading-text-delete');
+                document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
+                  if (elem) {
+                    elem.disabled = false;
                   };
-                  if (document.querySelector('.clients__dialog_change').hasAttribute('open')) {
-                    smoothlyClossingDialog('clients__dialog_delete');
-                    smoothlyClossingDialog('clients__dialog_change');
-                  } else {
-                      smoothlyClossingDialog('clients__dialog_delete');
+                });
+                document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
+                  if (elem) {
+                    elem.disabled = false;
+                  };
+                });
+                document.querySelector('.clients__add-btn').disabled = false;
+              })
+              .then((prom) => {
+                if (prom) {
+                  let errorElement = document.querySelector('.dialog__errors_del');
+                  if (prom.status === 404) {
+                    console.log('Клиент не найден!');
+                    row.remove();
+                    let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+                    if (Number(indexOfDeletedClient) >= 0) {
+                      workArr.splice(indexOfDeletedClient, 1);
+                      renderArr.splice(indexOfDeletedClient, 1);
                     };
-                  loadingIcon.classList.add('hidden');
-                  deleteButton.disabled = false;
-                } else {
-                    let errorElement = document.querySelector('.dialog__errors_del');
-                    errorElement.innerHTML = 'Клиент не найден!';
-                    loadingIcon.classList.add('hidden');
-                    deleteButton.disabled = false;
+                  } else if (prom.status === 500) {
+                      console.log('Сервер не отвечает!');
+                    } else if (prom.status === 200) {
+                        openDialogAndLockScroll('clients__dialog_delete');
+                        let deleteButton = document.querySelector('.dialog__button_del');
+                        if (deleteButton) {
+                          deleteButton.onclick = async () => {
+                            deleteButton.disabled = true;
+                            let loadingIcon = document.querySelector('.button-del__loading');
+                            loadingIcon.classList.remove('hidden');
+                            await toDeleteClient(client)
+                              .finally(() => {
+                                loadingIcon.classList.add('hidden');
+                                deleteButton.disabled = false;
+                              })
+                              .then(async (resp) => {
+                                if (resp.status === 404) {
+                                  errorElement.textContent = 'Ошибка: клиент не найден';
+                                  row.remove();
+                                  let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+                                  if (Number(indexOfDeletedClient) >= 0) {
+                                    workArr.splice(indexOfDeletedClient, 1);
+                                    renderArr.splice(indexOfDeletedClient, 1);
+                                  };
+                                  throw new Error('Клиент не найден!');
+                                } else if (resp.status === 500) {
+                                    errorElement.textContent = 'Ошибка: сервер не отвечает';
+                                    throw new Error('Сервер не отвечает!');
+                                  } else if (resp.status === 200) {
+                                      row.remove();
+                                      let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
+                                      if (Number(indexOfDeletedClient) >= 0) {
+                                        workArr.splice(indexOfDeletedClient, 1);
+                                        renderArr.splice(indexOfDeletedClient, 1);
+                                      };
+                                      if (document.querySelector('.clients__dialog_change').hasAttribute('open')) {
+                                        smoothlyClossingDialog('clients__dialog_delete');
+                                        smoothlyClossingDialog('clients__dialog_change');
+                                      } else {
+                                          smoothlyClossingDialog('clients__dialog_delete');
+                                        };
+                                    } else {
+                                        errorElement.textContent = 'Ошибка: что-то пошло не так...';
+                                        throw new Error('Что-то пошло не так...');
+                                      };
+                              })
+                              .catch((error) => {
+                                console.log(`Ошибка: ${error.message}`);
+                              });
+                          };
+                        };
+                      } else {
+                          console.log('Что-то пошло не так...');
+                        };
                 };
               })
               .catch((error) => {
-                let errorElement = document.querySelector('.dialog__errors_del');
-                errorElement.innerHTML = 'Что-то пошло не так...';
-                loadingIcon.classList.add('hidden');
-                deleteButton.disabled = false;
                 console.log(`Ошибка: ${error.message}`);
               });
-          };
-        };
-      } else if (requestClient === false) {
-          console.log('Клиент не найден!');
-          toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
-          toDeleteElemCol6Span.classList.remove('loading-text-delete');
-          document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
-            if (elem) {
-              elem.disabled = false;
-            };
-          });
-          document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
-            if (elem) {
-              elem.disabled = false;
-            };
-          });
-          document.querySelector('.clients__add-btn').disabled = false;
-          row.remove();
-          let indexOfDeletedClient = workArr.findIndex(i => i.id === `${client.id}`);
-          if (Number(indexOfDeletedClient) >= 0) {
-            workArr.splice(indexOfDeletedClient, 1);
-            renderArr.splice(indexOfDeletedClient, 1);
-          };
-      } else {
-          toDeleteElemCol6Icon.classList.remove('loading-icon', 'loading-icon_delete');
-          toDeleteElemCol6Span.classList.remove('loading-text-delete');
-          document.querySelectorAll('.table__toChangeElemCol6').forEach((elem) => {
-            if (elem) {
-              elem.disabled = false;
-            };
-          });
-          document.querySelectorAll('.table__toDeleteElemCol6').forEach((elem) => {
-            if (elem) {
-              elem.disabled = false;
-            };
-          });
-          document.querySelector('.clients__add-btn').disabled = false;
-        };
     };
 
     // Изменение
@@ -742,9 +728,13 @@
                   
                   
                   
-                  //ЗДЕСЬ СДЕЛАТЬ ВСЁ ОФОРМЛЕНИЕ ОШИБОК ВАЛИДАЦИИ! СДЕЛАТЬ ВАЛИДАЦИЮ НА КЛИЕНТЕ!, исправить условия при ошибках 422, 404, 5..., адаптивность и всё 
+                  //ЗДЕСЬ СДЕЛАТЬ ВСЁ ОФОРМЛЕНИЕ ОШИБОК ВАЛИДАЦИИ! СДЕЛАТЬ ВАЛИДАЦИЮ НА КЛИЕНТЕ!, исправить условия при ошибках 422, 404, 5.... Сейчас, после исправления Удалить, изменить не работает
+                  
+                  // адаптивность
 
+                  //обработать 500,404 в первой загрузке и переделать все запросы хорошо
 
+                  //обработать 500,404 в добавить и переделать все запросы хорошо
 
                     errorElement.textContent = '';
                     let respOfErrors = await resp.json();
@@ -944,12 +934,14 @@
     let methods = {
       async toRequestClient(clientItem) {
         return await fetch(`${URL}${clientItem.id}`)
-                        .then((resp) => {
-                          return resp.json();
-                        })
-                        .catch((error) => {
-                          console.log(`Ошибка: ${error.message}`);
-                        });
+                        // .then((resp) => {
+                        //   return resp;
+                          // 08.07 убрал .json() у resp
+                        // })
+                        // .catch((error) => {
+                        //   console.log(`Ошибка: ${error.message}`);
+                        // });
+                          // 08.07 убрал всё это в комменты
       },
       async toChangeClient(clientItem, clientNewData) {
         return await fetch(`${URL}${clientItem.id}`, {
@@ -1035,7 +1027,7 @@
         document.querySelectorAll('.wrap-new__contact').forEach((el) => {
           el.querySelector('input').classList.remove('dialog__input_invalid');
         });
-        // Валидация
+        // Валидация на клиенте
         let errorElement = document.querySelector('.dialog__errors_new');
         let flagInvalidSurname = true;
         let flagInvalidName = true;
