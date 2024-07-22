@@ -255,7 +255,9 @@ body {
 }
 
 .table {
+  min-width: 728px;
   border-collapse: collapse;
+  overflow-x: scroll;
 }
 
 .table__tr-th {
@@ -293,6 +295,7 @@ body {
 }
 
 .table__th_does {
+  padding-right: 20px;
   width: 200px;
 }
 
@@ -436,9 +439,11 @@ body {
 
 .table__td_id {
   padding-left: 20px;
+  width: 75px;
   font-size: 12px;
   line-height: 16px;
   color: var(--color-text-gray);
+  word-break: break-all;
 }
 
 .table__td_does {
@@ -767,6 +772,12 @@ body {
   color: var(--color-interactive-elements);
 }
 
+.wrap-new__add-contact:disabled,
+.wrap-change__add-contact:disabled {
+  text-decoration: none;
+  pointer-events: none;
+}
+
 .add-contact__plus {
   width: 16px;
   height: 16px;
@@ -912,11 +923,87 @@ body {
   text-align: center;
 }
 
-/* @media (max-width: 1254px) {
-  .add-form__label:has(.add-form__input_year-study) .add-form__span {
-    top: -125%;
+@media (max-width: 1023px) {
+  .table__wrapCol3,
+  .table__wrapCol4,
+  .table__wrapCol6 {
+    justify-content: flex-start;
+    gap: 5px;
   }
-} */
+
+  .table__wrapCol5 {
+    gap: 7px;
+    width: 112px;
+  }
+
+  .table__th {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .table__th_id {
+    padding-left: 20px;
+  }
+
+  .table__th_does {
+    padding-right: 20px;
+  }
+
+  .table__th_id {
+    width: 84px;
+  }
+
+  .table__th_fio {
+    width: 257px;
+  }
+
+  .table__th_created, 
+  .table__th_changed {
+    width: 101px;
+  }
+
+  .table__th_contacts {
+    width: 120px;
+  }
+
+  .table__th_does {
+    width: auto;
+  }
+
+  .table__td {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .table__td_id {
+    padding-left: 20px;
+  }
+
+  .table__td_does {
+    padding-right: 20px;
+  }
+
+  .table__th-btn {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .table__th-btn_id {
+    padding-left: 20px;
+  }
+
+  .table__th-btn_does {
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 910px) {
+  .table__wrapCol3,
+  .table__wrapCol4,
+  .table__wrapCol6 {
+    flex-direction: column;
+  }
+}
 
 @keyframes loading {
   from {

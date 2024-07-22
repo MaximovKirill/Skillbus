@@ -740,6 +740,7 @@
                   };
                   // Сохранить
                   let changeButton = document.querySelector('.dialog__button_change');
+                  let addContactBtn = document.querySelector('.wrap-change__add-contact');
                   let loadingIcon = document.querySelector('.button-save__loading');
                   let changeDeleteButton = document.querySelector('.dialog__button_change-del');
                   if (changeButton) {
@@ -747,6 +748,13 @@
                       changeButton.disabled = true;
                       changeDeleteButton.disabled = true;
                       loadingIcon.classList.remove('hidden');
+                      addContactBtn.disabled = true;
+                      inputName.disabled = true;
+                      inputSurname.disabled = true; 
+                      inputLastName.disabled = true;
+                      document.querySelectorAll('.contact__value').forEach((el) => {
+                        el.disabled = true;
+                      });
                       document.querySelectorAll('.contact__value').forEach((el) => {
                         el.oninput = () => {
                           el.classList.remove('dialog__input_invalid');
@@ -777,6 +785,13 @@
                             loadingIcon.classList.add('hidden');
                             changeButton.disabled = false;
                             changeDeleteButton.disabled = false;
+                            addContactBtn.disabled = false;
+                            inputName.disabled = false;
+                            inputSurname.disabled = false; 
+                            inputLastName.disabled = false;
+                            document.querySelectorAll('.contact__value').forEach((el) => {
+                              el.disabled = false;
+                            });
                           })
                           .then(async (resp) => {
                             let errorElement = document.querySelector('.dialog__errors_change');
@@ -862,6 +877,13 @@
                           loadingIcon.classList.add('hidden');
                           changeButton.disabled = false;
                           changeDeleteButton.disabled = false;
+                          addContactBtn.disabled = false;
+                          inputName.disabled = false;
+                          inputSurname.disabled = false; 
+                          inputLastName.disabled = false;
+                          document.querySelectorAll('.contact__value').forEach((el) => {
+                            el.disabled = false;
+                          });
                         };
                     };
                   };
@@ -871,11 +893,25 @@
                       changeDeleteButton.disabled = true;
                       changeButton.disabled = true;
                       loadingIcon.classList.remove('hidden');
+                      addContactBtn.disabled = true;
+                      inputName.disabled = true;
+                      inputSurname.disabled = true; 
+                      inputLastName.disabled = true;
+                      document.querySelectorAll('.contact__value').forEach((el) => {
+                        el.disabled = true;
+                      });
                       await toRequestClient(client)
                         .finally(() => {
                           changeDeleteButton.disabled = false;
                           changeButton.disabled = false;
                           loadingIcon.classList.add('hidden');
+                          addContactBtn.disabled = false;
+                          inputName.disabled = false;
+                          inputSurname.disabled = false; 
+                          inputLastName.disabled = false;
+                          document.querySelectorAll('.contact__value').forEach((el) => {
+                            el.disabled = false;
+                          });
                         })
                         .then((prom) => {
                           let errorElementChange = document.querySelector('.dialog__errors_change');
@@ -983,17 +1019,6 @@
         });
     };
 
-
-                    // адаптивность
-                              
-                    //обработать 500,404 в первой загрузке и переделать все запросы хорошо
-                              
-                    //обработать 500,404,201 в Добавить и переделать все запросы хорошо
-
-                    // тз, доп.задания
-
-  
-
     // Удаление
     toDeleteElemCol6.addEventListener('click', () => {
       toDeleteElemCol6Icon.classList.add('loading-icon', 'loading-icon_delete');
@@ -1099,11 +1124,19 @@
     // Загрузка таблицы
     await fetch(URL)
       .then(async (resp) => {
-        if (resp.status === 200) {
-          let clientsList = await resp.json();
-          workArr = [...clientsList];
-          sortArr = [...clientsList];
-          tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
+        if (resp) {
+          if (resp.status === 404) {
+            throw new Error(ERR);
+          } else if (resp.status === 500) {
+              throw new Error('Сервер не отвечает!');
+            } else if (resp.status === 200) {
+                let clientsList = await resp.json();
+                workArr = [...clientsList];
+                sortArr = [...clientsList];
+                tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
+              } else {
+                  throw new Error(ERR);
+                };
         } else {
             throw new Error(ERR);
           };
@@ -1116,7 +1149,13 @@
         });
         if (tbody.querySelector('.table__loading-img')) {
           tbody.querySelector('.table__loading-img').remove();
-          tbody.querySelector('.table__td_default').textContent = ERR;
+          if (error.message === 'Failed to fetch') {
+            tbody.querySelector('.table__td_default').textContent = 'Ошибка: проблемы с сетью!';
+            console.log('Ошибка: проблемы с сетью!');
+          } else {
+              tbody.querySelector('.table__td_default').textContent = `Ошибка: ${error.message}`;
+              console.log(`Ошибка: ${error.message}`);
+            };
         } else {
             tbody.querySelectorAll('tr').forEach((el) => {
               el.remove();
@@ -1128,9 +1167,14 @@
             row.classList.add('table__tr', 'table__tr_default');
             col.classList.add('table__td', 'table__td_default');
             col.setAttribute('colspan', '6');
-            col.textContent = ERR;
+            if (error.message === 'Failed to fetch') {
+              col.textContent = 'Ошибка: проблемы с сетью!';
+              console.log('Ошибка: проблемы с сетью!');
+            } else {
+                col.textContent = `Ошибка: ${error.message}`;
+                console.log(`Ошибка: ${error.message}`);
+              };
           };
-        console.log(`Ошибка: ${error.message}`);
       });
 
     // Добавление клиента
@@ -1153,12 +1197,20 @@
             el.classList.remove('dialog__input_invalid');
           };
         });
+        document.querySelectorAll('.wrap-new__contact').forEach((el) => {
+          el.querySelector('input').classList.remove('dialog__input_invalid');
+        });
         addClientBtn.disabled = true;
         let loadingIcon = document.querySelector('.button-new__loading');
         loadingIcon.classList.remove('hidden');
         document.querySelector('.dialog__errors_new').textContent = '';
-        document.querySelectorAll('.wrap-new__contact').forEach((el) => {
-          el.querySelector('input').classList.remove('dialog__input_invalid');
+        inputName.disabled = true;
+        inputSurname.disabled = true; 
+        inputLastName.disabled = true;
+        let addContactBtn = document.querySelector('.wrap-new__add-contact');
+        addContactBtn.disabled = true;
+        document.querySelectorAll('.contact__value').forEach((el) => {
+          el.disabled = true;
         });
         if (validation('new')) {
           let arrElementsOfContacts = document.querySelectorAll('.wrap-new__contact');
@@ -1186,58 +1238,85 @@
             .finally(() => {
               addClientBtn.disabled = false;
               loadingIcon.classList.add('hidden');
+              inputName.disabled = false;
+              inputSurname.disabled = false; 
+              inputLastName.disabled = false;
+              addContactBtn.disabled = false;
+              document.querySelectorAll('.contact__value').forEach((el) => {
+                el.disabled = false;
+              });
             })
             .then(async (resp) => {
-              if (resp.status === 422) {
+              if (resp) {
                 let errorElement = document.querySelector('.dialog__errors_new');
-                errorElement.textContent = 'Ошибка: \n';
-                let respOfErrors = await resp.json();
-                let arrOfErrors = respOfErrors.errors;
-                arrOfErrors.forEach((elem) => {
-                  switch (elem.field) {
-                    case 'name':
-                      inputName.classList.add('dialog__input_invalid');
-                      errorElement.textContent = errorElement.textContent + elem.message + '; ';
-                      console.log(elem.message);
-                      break;
-                    case 'surname':
-                      inputSurname.classList.add('dialog__input_invalid');
-                      errorElement.textContent = errorElement.textContent + elem.message + '; ';
-                      console.log(elem.message);
-                      break;
-                    case 'contacts':
-                      let arrElementsOfContacts = document.querySelectorAll('.wrap-new__contact');
-                      if (arrElementsOfContacts.length) {
-                        for (let i = 0; i < arrElementsOfContacts.length; i++) {
-                          if (!arrElementsOfContacts[i].querySelector('input').value) {
-                            arrElementsOfContacts[i].querySelector('input').classList.add('dialog__input_invalid');
-                          };
-                        };
-                      };
-                      errorElement.textContent = errorElement.textContent + elem.message + '; ';
-                      console.log(elem.message);
-                      break;
-                  };
-                });
-                throw new Error('Ошибка валидации!');
-              } else if (resp.status === 500) {        
+                if (resp.status === 500) {
                   errorElement.textContent = 'Ошибка: сервер не отвечает';
                   throw new Error('Сервер не отвечает!');
-                } else {
-                    let newClient = await resp.json();
-                    workArr.push(newClient);
-                    sortArr.splice(0);
-                    sortArr = [...workArr];
-                    tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
-                    addClientWindowClose();
-                  };
+                } else if (resp.status === 422) {
+                    errorElement.textContent = 'Ошибка: \n';
+                    let respOfErrors = await resp.json();
+                    let arrOfErrors = respOfErrors.errors;
+                    arrOfErrors.forEach((elem) => {
+                      switch (elem.field) {
+                        case 'name':
+                          inputName.classList.add('dialog__input_invalid');
+                          errorElement.textContent = errorElement.textContent + elem.message + '; ';
+                          console.log(elem.message);
+                          break;
+                        case 'surname':
+                          inputSurname.classList.add('dialog__input_invalid');
+                          errorElement.textContent = errorElement.textContent + elem.message + '; ';
+                          console.log(elem.message);
+                          break;
+                        case 'contacts':
+                          let arrElementsOfContacts = document.querySelectorAll('.wrap-new__contact');
+                          if (arrElementsOfContacts.length) {
+                            for (let i = 0; i < arrElementsOfContacts.length; i++) {
+                              if (!arrElementsOfContacts[i].querySelector('input').value) {
+                                arrElementsOfContacts[i].querySelector('input').classList.add('dialog__input_invalid');
+                              };
+                            };
+                          };
+                          errorElement.textContent = errorElement.textContent + elem.message + '; ';
+                          console.log(elem.message);
+                          break;
+                      };
+                    });
+                    throw new Error('Ошибка валидации!');
+                  } else if (resp.status === 200 || resp.status === 201) {
+                      let newClient = await resp.json();
+                      workArr.push(newClient);
+                      sortArr.splice(0);
+                      sortArr = [...workArr];
+                      tableView(tbody, workArr, sort(sortArr, 'id', false), methods);
+                      addClientWindowClose();
+                    } else {
+                        throw new Error(ERR);
+                      };
+              } else {
+                  throw new Error(ERR);
+                };      
             })
             .catch((error) => {
-              console.log(error.message);
+              let errorElement = document.querySelector('.dialog__errors_new');
+              if (error.message === 'Failed to fetch') {
+                errorElement.textContent = 'Ошибка: проблемы с сетью!';
+                console.log('Ошибка: проблемы с сетью!');
+              } else {
+                  errorElement.textContent = `Ошибка: ${error.message}`;
+                  console.log(`Ошибка: ${error.message}`);
+                };
             });
         } else {
             addClientBtn.disabled = false;
             loadingIcon.classList.add('hidden');
+            inputName.disabled = false;
+            inputSurname.disabled = false; 
+            inputLastName.disabled = false;
+            addContactBtn.disabled = false;
+            document.querySelectorAll('.contact__value').forEach((el) => {
+              el.disabled = false;
+            });
           };
       };
     };
@@ -1309,4 +1388,3 @@
 
   window.createSkillbusApp = skillbusApp;
 })();
-
