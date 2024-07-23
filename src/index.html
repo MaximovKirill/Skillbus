@@ -24,7 +24,7 @@
       <h1 class="visually-hidden">SRM-система Skillbus</h1>
       <div class="header__wrap flex">
         <a class="header__logo" href="#" aria-label="Главная страница Skillbus">
-          <img class="header__logo" src="img/logo.svg" alt="Логотип Skillbus">
+          <img class="header__logo-img" src="img/logo.svg" alt="Логотип Skillbus">
         </a>
         <input class="header__search" type="text" inputmode="search" placeholder="Введите запрос">
       </div>
@@ -34,42 +34,44 @@
     <section class="clients section-offset">
       <div class="container">
         <h2 class="clients__title section-title">Клиенты</h2>
-        <table class="clients__table table">
-          <thead class="table__thead">
-            <tr class="table__tr-th">
-              <th class="table__th table__th_sort table__th_id" scope="col">
-                <button class="table__th-btn table__th-btn_id btn-reset" data-path="0">
-                  <span class="table__span-id">ID</span>
-                </button>
-              </th>
-              <th class="table__th table__th_sort table__th_fio" scope="col">
-                <button class="table__th-btn btn-reset" data-path="1">
-                  <span class="table__span-fio">Фамилия Имя Отчество</span>
-                  <span class="table__span-sort">А-Я</span>
-                </button>
-              </th>
-              <th class="table__th table__th_sort table__th_created" scope="col">
-                <button class="table__th-btn btn-reset" data-path="2">
-                  <span class="table__span-created">Дата и время создания</span>
-                </button>
-              </th>
-              <th class="table__th table__th_sort table__th_changed" scope="col">
-                <button class="table__th-btn btn-reset" data-path="3">
-                  <span class="table__span-changed">Последние изменения</span>
-                </button>
-              </th>
-              <th class="table__th table__th_contacts" scope="col" data-path="4">Контакты</th>
-              <th class="table__th table__th_does" scope="col" data-path="5">Действия</th>
-            </tr>
-          </thead>
-          <tbody id="tbody" class="table__tbody">
-            <tr class="table__tr table__tr_default">
-              <td class="table__td table__td_default" colspan="6">
-                <img class="table__loading-img" src="img/loading.svg" alt="Загрузка">
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="clients__wrap-table">
+          <table class="clients__table table">
+            <thead class="table__thead">
+              <tr class="table__tr-th">
+                <th class="table__th table__th_sort table__th_id" scope="col">
+                  <button class="table__th-btn table__th-btn_id btn-reset" data-path="0">
+                    <span class="table__span-id">ID</span>
+                  </button>
+                </th>
+                <th class="table__th table__th_sort table__th_fio" scope="col">
+                  <button class="table__th-btn btn-reset" data-path="1">
+                    <span class="table__span-fio">Фамилия Имя Отчество</span>
+                    <span class="table__span-sort">А-Я</span>
+                  </button>
+                </th>
+                <th class="table__th table__th_sort table__th_created" scope="col">
+                  <button class="table__th-btn table__th-btn_created btn-reset" data-path="2">
+                    <span class="table__span-created">Дата и время создания</span>
+                  </button>
+                </th>
+                <th class="table__th table__th_sort table__th_changed" scope="col">
+                  <button class="table__th-btn btn-reset" data-path="3">
+                    <span class="table__span-changed">Последние изменения</span>
+                  </button>
+                </th>
+                <th class="table__th table__th_contacts" scope="col" data-path="4">Контакты</th>
+                <th class="table__th table__th_does" scope="col" data-path="5">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="tbody" class="table__tbody">
+              <tr class="table__tr table__tr_default">
+                <td class="table__td table__td_default" colspan="6">
+                  <img class="table__loading-img" src="img/loading.svg" alt="Загрузка">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div> 
         <button id="addBtn" class="clients__add-btn btn-reset" type="button">Добавить клиента</button>
 
         <dialog class="clients__dialog clients__dialog_new dialog">

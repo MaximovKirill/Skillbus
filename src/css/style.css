@@ -218,13 +218,13 @@ body {
 .header__wrap {
   align-items: center;
   gap: 53px;
-  padding: 20px 0px;
+  height: 90px;
 }
 
 .header__logo {
+  flex-shrink: 0;
   display: block;
   width: 50px;
-  height: 50px;
 }
 
 .header__search {
@@ -250,17 +250,29 @@ body {
 }
 
 .clients__table {
-  margin-bottom: 40px;
   width: 100%;
 }
 
+.clients__wrap-table {
+  position: relative;
+  overflow: auto;
+}
+
 .table {
+  display: inline-block;
+  max-width: 100%;
   min-width: 728px;
   border-collapse: collapse;
-  overflow-x: scroll;
+	vertical-align: top;
+	overflow-x: auto;
+}
+
+.table__thead {
+  width: 100%;
 }
 
 .table__tr-th {
+  width: 100%;
   height: 40px;
   text-align: left;
   border: none;
@@ -272,12 +284,19 @@ body {
 }
 
 .table__th_id {
-  width: 125px;
+  width: 8%;
 }
 
-.table__th_created,
+.table__th_fio {
+  width: 24%;
+}
+
+.table__th_created {
+  width: 16%;
+}
+
 .table__th_changed {
-  width: 150px;
+  width: 14%;
 }
 
 .table__th_contacts,
@@ -291,12 +310,12 @@ body {
 }
 
 .table__th_contacts {
-  width: 140px;
+  width: 16%;
 }
 
 .table__th_does {
   padding-right: 20px;
-  width: 200px;
+  width: 22%;
 }
 
 .table__span-id {
@@ -321,8 +340,11 @@ body {
 
 .table__th-btn_id {
   padding-left: 20px;
-  padding-right: 44px;
   color: var(--color-interactive-elements);
+}
+
+.table__th-btn_created {
+  padding-right: 50px;
 }
 
 .table__span-id::after {
@@ -452,6 +474,7 @@ body {
 
 .table__wrapCol6 {
   justify-content: space-between;
+  gap: 5px;
 }
 
 .table__toChangeElemCol6,
@@ -490,15 +513,14 @@ body {
 }
 
 .table__wrapCol3,
-.table__wrapCol4,
-.table__wrapCol5,
-.table__wrapCol6 {
+.table__wrapCol4 {
   gap: 10px;
 }
 
 .table__wrapCol5 {
   flex-wrap: wrap;
-  width: 120px;
+  gap: 7px;
+  width: 108px;
 }
 
 .table__timeElemCol3,
@@ -549,8 +571,7 @@ body {
 
 .clients__add-btn {
   display: block;
-  margin: 0 auto;
-  margin-bottom: 20px;
+  margin: 40px auto 20px auto;
   padding: 13px 27px 13px 59px;
   font-weight: 600;
   color: var(--color-interactive-elements);
@@ -923,17 +944,11 @@ body {
   text-align: center;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 950px) {
   .table__wrapCol3,
-  .table__wrapCol4,
-  .table__wrapCol6 {
-    justify-content: flex-start;
+  .table__wrapCol4 {
+    flex-direction: column;
     gap: 5px;
-  }
-
-  .table__wrapCol5 {
-    gap: 7px;
-    width: 112px;
   }
 
   .table__th {
@@ -950,24 +965,27 @@ body {
   }
 
   .table__th_id {
-    width: 84px;
+    width: 10%;
   }
 
   .table__th_fio {
-    width: 257px;
+    width: 30%;
   }
 
-  .table__th_created, 
+  .table__th_created {
+    width: 14%;
+  }
+
   .table__th_changed {
-    width: 101px;
+    width: 13%;
   }
 
   .table__th_contacts {
-    width: 120px;
+    width: 18%;
   }
 
   .table__th_does {
-    width: auto;
+    width: 15%;
   }
 
   .table__td {
@@ -997,11 +1015,90 @@ body {
   }
 }
 
-@media (max-width: 910px) {
-  .table__wrapCol3,
-  .table__wrapCol4,
+@media (max-width: 820px) {
   .table__wrapCol6 {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 500px) {
+  .container {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .header__wrap {
+    justify-content: center;
+    height: 40px;
+  }
+  
+  .header__logo {
+    width: 24px;
+  }
+
+  .header__search {
+    display: none;
+  }
+
+  .section-offset {
+    padding-top: 26px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .clients__add-btn {
+    margin: 33px auto 20px auto;
+  }
+
+  .dialog {
+    max-width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+  }
+
+  .dialog__wrap {
+    width: 300px;
+  }
+
+  .dialog__wrap_delete {
+    padding: 22px 15px;
+  }
+
+  .wrap-change__top,
+  .wrap-new__top {
+    padding: 24px 15px;
+  }
+
+  .wrap-change__contacts,
+  .wrap-new__contacts {
+    padding: 25px 15px;
+  }
+
+  .dialog__errors {
+    padding: 15px;
+  }
+
+  .wrap-change__bottom,
+  .wrap-new__bottom {
+    padding: 5px 15px 24px 15px;
+  }
+
+  .choices {
+    width: 110px;
+  }
+
+  .contact__value {
+    width: 133px;
+  }
+
+  .dialog__button_close {
+    top: 3px;
+    right: 3px;
+  }
+
+  .clients__title {
+    padding-bottom: 5px;
   }
 }
 
