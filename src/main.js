@@ -1142,7 +1142,7 @@
           };
       })
       .catch((error) => {
-        document.querySelector('.clients__add-btn').style.display = 'none';
+        document.querySelector('.clients__add-btn').disabled = true;
         document.querySelector('.header__search').setAttribute('disabled', 'disabled');
         document.querySelectorAll('.table__th-btn').forEach((el) => {
           el.setAttribute('disabled', 'disabled');

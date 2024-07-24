@@ -249,30 +249,18 @@ body {
   padding-bottom: 10px;
 }
 
-.clients__table {
-  width: 100%;
-}
-
 .clients__wrap-table {
-  position: relative;
   overflow: auto;
 }
 
 .table {
-  display: inline-block;
-  max-width: 100%;
-  min-width: 728px;
-  border-collapse: collapse;
-	vertical-align: top;
-	overflow-x: auto;
-}
-
-.table__thead {
   width: 100%;
+  min-width: 728px;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .table__tr-th {
-  width: 100%;
   height: 40px;
   text-align: left;
   border: none;
@@ -288,7 +276,7 @@ body {
 }
 
 .table__th_fio {
-  width: 24%;
+  width: 23%;
 }
 
 .table__th_created {
@@ -296,7 +284,7 @@ body {
 }
 
 .table__th_changed {
-  width: 14%;
+  width: 15%;
 }
 
 .table__th_contacts,
@@ -310,12 +298,12 @@ body {
 }
 
 .table__th_contacts {
-  width: 16%;
+  width: 15%;
 }
 
 .table__th_does {
   padding-right: 20px;
-  width: 22%;
+  width: 23%;
 }
 
 .table__span-id {
@@ -946,7 +934,8 @@ body {
 
 @media (max-width: 950px) {
   .table__wrapCol3,
-  .table__wrapCol4 {
+  .table__wrapCol4,
+  .table__wrapCol6 {
     flex-direction: column;
     gap: 5px;
   }
@@ -1128,3 +1117,5 @@ body {
     opacity: 0;
   }
 }
+
+/* схлопывается таблица, сделать в файлах гитлаба, скопировать в папку гидхаба потом и закомитить в 2 системы */
