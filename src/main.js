@@ -1,6 +1,8 @@
 (() => {
   const URL = 'http://localhost:3000/api/clients/';
   const ERR = 'Что-то пошло не так...';
+  const EMAIL_REGEXP = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  const TEL_REGEXP = /^[\+0-9][0-9][0-9][0-9][0-9]+$/;
 
   // Настройка селекта
   function customizeSelect(elem) {
@@ -27,7 +29,7 @@
   // Добавление нуля к числу, месяцу, часу или минуте при отображении даты и времени
   function getDateWithZero(dateElem, num = false, month = false, hour = false, min = false) {
     let resultDateElem = '';
-    if (num === true) {
+    if (num) {
       resultDateElem = (String(dateElem.getDate()).length === 1) ? `0${dateElem.getDate()}` : `${dateElem.getDate()}`;
     } else if (month === true) {
         resultDateElem = (String(dateElem.getMonth() + 1).length === 1) ? `0${dateElem.getMonth() + 1}` : `${dateElem.getMonth() + 1}`;
@@ -267,6 +269,16 @@
     let flagInvalidSurname = true;
     let flagInvalidName = true;
     let flagInvalidContact = true;
+    let flagInvalidEmail = true;
+    let flagInvalidTel = true;
+    // Функция проверки валидности содержимого поля Email
+    function isEmailValid(value) {
+      return EMAIL_REGEXP.test(value);
+    };
+    // Функция проверки валидности содержимого поля Телефон
+    function isTelValid(value) {
+      return TEL_REGEXP.test(value);
+    };
     if (!inputSurname.value) {
       flagInvalidSurname = false;
       inputSurname.classList.add('dialog__input_invalid');
@@ -282,9 +294,21 @@
           arrElementsOfContacts[i].querySelector('input').classList.add('dialog__input_invalid');
           flagInvalidContact = false;
         };
+        if (arrElementsOfContacts[i].querySelector('option[value=Email]')) {
+          if (!isEmailValid(arrElementsOfContacts[i].querySelector('.contact__value').value)) {
+            arrElementsOfContacts[i].querySelector('input').classList.add('dialog__input_invalid');
+            flagInvalidEmail = false;
+          };
+        };
+        if (arrElementsOfContacts[i].querySelector('option[value=Телефон]')) {
+          if (!isTelValid(arrElementsOfContacts[i].querySelector('.contact__value').value)) {
+            arrElementsOfContacts[i].querySelector('input').classList.add('dialog__input_invalid');
+            flagInvalidTel = false;
+          };
+        };
       };
     };
-    if (!flagInvalidSurname || !flagInvalidName || !flagInvalidContact) {
+    if (!flagInvalidSurname || !flagInvalidName || !flagInvalidContact || !flagInvalidEmail || !flagInvalidTel) {
       errorElement.textContent = 'Ошибка: \n';
     };
     if (!flagInvalidSurname) {
@@ -296,7 +320,13 @@
     if (!flagInvalidContact) {
       errorElement.textContent = errorElement.textContent + 'введите все контакты; \n';
     };
-    return (!flagInvalidSurname || !flagInvalidName || !flagInvalidContact) ? false : true;
+    if (!flagInvalidEmail) {
+      errorElement.textContent = errorElement.textContent + 'введите корректный Email; \n';
+    };
+    if (!flagInvalidTel) {
+      errorElement.textContent = errorElement.textContent + 'введите корректный телефон; \n';
+    };
+    return flagInvalidSurname && flagInvalidName && flagInvalidContact && flagInvalidEmail && flagInvalidTel;
   };
 
   //Рендер клиента
@@ -745,6 +775,8 @@
                   let changeDeleteButton = document.querySelector('.dialog__button_change-del');
                   if (changeButton) {
                     changeButton.onclick = async () => {
+                      let errorElement = document.querySelector('.dialog__errors_change');
+                      errorElement.textContent = '';
                       changeButton.disabled = true;
                       changeDeleteButton.disabled = true;
                       loadingIcon.classList.remove('hidden');
@@ -795,6 +827,7 @@
                           })
                           .then(async (resp) => {
                             let errorElement = document.querySelector('.dialog__errors_change');
+                            errorElement.textContent = '';
                             if (resp.status === 404) {
                               errorElement.textContent = 'Ошибка: клиент не найден';
                               row.remove();

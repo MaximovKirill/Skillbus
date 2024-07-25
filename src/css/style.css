@@ -796,6 +796,7 @@ body {
   background-size: contain;
 }
 
+.wrap-new__add-contact:hover .add-contact__plus,
 .wrap-change__add-contact:hover .add-contact__plus {
   background-image: url(../img/add-contact_hover.svg);
 }
